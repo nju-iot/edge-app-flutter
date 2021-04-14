@@ -14,7 +14,6 @@ class IndexPage extends StatefulWidget{
 }
 
 class _IndexPageState extends State<IndexPage>{
-  //int _currentIndex = 0;
 
   List<BottomNavigationBarItem> getTabs(BuildContext context) =>[
     BottomNavigationBarItem(icon: Icon(Icons.airplay),label:"边缘端"),
@@ -22,11 +21,6 @@ class _IndexPageState extends State<IndexPage>{
     BottomNavigationBarItem(icon: Icon(Icons.account_box),label:"用户"),
   ];
 
-  final List _tabWidget = [
-    HomeRoute(),
-    CloudRoute(),
-    UserRoute(),
-  ];
 
   List<Widget> getTabWidget(BuildContext context) =>[
     HomeRoute(),

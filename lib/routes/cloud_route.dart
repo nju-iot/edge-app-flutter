@@ -20,16 +20,16 @@ class _CloudRouteState extends State<CloudRoute>{
       footer: MaterialFooter(),
       onRefresh: () async {
         await Future.delayed(Duration(seconds: 1), () {
-          setState(() {
+          /*setState(() {
             _count = 5;
-          });
+          });*/
         });
       },
       onLoad: () async {
         await Future.delayed(Duration(seconds: 1), () {
-          setState(() {
+          /*setState(() {
             _count += 5;
-          });
+          });*/
         });
       },
       slivers: <Widget>[
