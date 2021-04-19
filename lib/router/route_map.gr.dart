@@ -9,6 +9,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
+import '../page/device/device_info.dart';
 import '../page/device/device_page.dart';
 import '../page/interval/interval_page.dart';
 import '../page/notification/notice_page.dart';
@@ -19,6 +20,7 @@ import '../page/theme_color.dart';
 import '../routes/cloud_route.dart';
 import '../routes/home_route.dart';
 import '../routes/user_route.dart';
+import 'route_map.dart';
 
 class Routes {
   static const String indexPage = '/';
@@ -31,6 +33,9 @@ class Routes {
   static const String intervalPage = '/page/interval/interval_page';
   static const String noticePage = '/page/notification/notice_page';
   static const String rulesPage = '/page/rule/rules_page';
+  static const String _deviceInfoPage = '/page/device/device_info/:name';
+  static String deviceInfoPage({@required dynamic name}) =>
+      '/page/device/device_info/$name';
   static const all = <String>{
     indexPage,
     homeRoute,
@@ -42,6 +47,7 @@ class Routes {
     intervalPage,
     noticePage,
     rulesPage,
+    _deviceInfoPage,
   };
 }
 
@@ -59,6 +65,7 @@ class RouterMap extends RouterBase {
     RouteDef(Routes.intervalPage, page: IntervalPage),
     RouteDef(Routes.noticePage, page: NoticePage),
     RouteDef(Routes.rulesPage, page: RulesPage),
+    RouteDef(Routes._deviceInfoPage, page: DeviceInfoPage),
   ];
   @override
   Map<Type, AutoRouteFactory> get pagesMap => _pagesMap;
@@ -73,6 +80,7 @@ class RouterMap extends RouterBase {
         settings: data,
         opaque: false,
         barrierDismissible: false,
+        transitionsBuilder: getTransitions,
         transitionDuration: const Duration(milliseconds: 800),
       );
     },
@@ -82,6 +90,7 @@ class RouterMap extends RouterBase {
         settings: data,
         opaque: false,
         barrierDismissible: false,
+        transitionsBuilder: getTransitions,
         transitionDuration: const Duration(milliseconds: 800),
       );
     },
@@ -91,6 +100,7 @@ class RouterMap extends RouterBase {
         settings: data,
         opaque: false,
         barrierDismissible: false,
+        transitionsBuilder: getTransitions,
         transitionDuration: const Duration(milliseconds: 800),
       );
     },
@@ -100,6 +110,7 @@ class RouterMap extends RouterBase {
         settings: data,
         opaque: false,
         barrierDismissible: false,
+        transitionsBuilder: getTransitions,
         transitionDuration: const Duration(milliseconds: 800),
       );
     },
@@ -116,6 +127,7 @@ class RouterMap extends RouterBase {
         settings: data,
         opaque: false,
         barrierDismissible: false,
+        transitionsBuilder: getTransitions,
         transitionDuration: const Duration(milliseconds: 800),
       );
     },
@@ -141,6 +153,17 @@ class RouterMap extends RouterBase {
       return PageRouteBuilder<dynamic>(
         pageBuilder: (context, animation, secondaryAnimation) => RulesPage(),
         settings: data,
+      );
+    },
+    DeviceInfoPage: (data) {
+      return PageRouteBuilder<dynamic>(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            DeviceInfoPage(name: data.pathParams['name'].stringValue),
+        settings: data,
+        opaque: false,
+        barrierDismissible: false,
+        transitionsBuilder: getTransitions,
+        transitionDuration: const Duration(milliseconds: 800),
       );
     },
   };

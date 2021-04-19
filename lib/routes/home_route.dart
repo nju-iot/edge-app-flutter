@@ -16,7 +16,7 @@ class HomeRoute extends StatefulWidget{
   _HomeRouteState createState() => _HomeRouteState();
 }
 
-///主界面，还没往里面填东西
+///主界面,暂时先这样
 class _HomeRouteState extends State<HomeRoute>{
 
   @override
@@ -32,19 +32,62 @@ class _HomeRouteState extends State<HomeRoute>{
         child: _buildBody(),
         onRefresh: _onrefresh,
     );
-
-    /*return Scaffold(
-        body:_buildBody(),
-    );*/
-
   }
 
 
 
   Widget _buildBody(){
+
+    String dropDownValue = 'One';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children:<Widget>[
+
+        Container(
+            width:double.infinity,
+            color:Colors.white,
+            padding:EdgeInsets.fromLTRB(8, 8, 8, 0),
+            child:Card(
+                color:Colors.lightBlueAccent,
+                child:Container(
+                  padding:EdgeInsets.all(10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                      children:<Widget>[
+                        Row(
+                          children:<Widget>[
+                            Container(
+                              //alignment: Alignment.topLeft,
+                              child:Text("当前服务器",
+                                style:TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors.white70),
+                              ),
+                            ),
+                            SizedBox(width:50.0),
+                            DropdownButton<String>(
+                              value: dropDownValue,
+                              onChanged: (String newValue) {
+                                setState(() {
+                                  dropDownValue = newValue;
+                                });
+                              },
+                              items: <String>['One', 'Two', 'Free', 'Four']
+                                  .map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ),
+                      ],
+                  ),
+                )
+            )
+        ),
+
+
         Container(
           width:double.infinity,
           color:Colors.white,
