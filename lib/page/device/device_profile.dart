@@ -7,11 +7,12 @@ class DeviceProfilePage extends StatefulWidget{
 
 }
 
+var tmp;
 class _DeviceProfilePageState extends State<DeviceProfilePage>{
 
   @override
   Widget build(BuildContext context){
-    var tmp;
+    //var tmp;
     return Scaffold(
         body:Column(
             children:<Widget>[
@@ -34,7 +35,20 @@ class _DeviceProfilePageState extends State<DeviceProfilePage>{
                           ),
                     );
                   }else{
-                    return Text("暂无数据");
+                    return Container(
+                      child:Expanded(
+                        child:PaginatedDataTable(
+                          rowsPerPage: 1,
+                          header: Text("DeviceProfile"),
+                          headingRowHeight: 24.0,
+                          horizontalMargin: 8.0,
+                          dataRowHeight: 60.0,
+                          columns: [DataColumn(label:Text("设备描述信息"))],
+                          source: MyProfileSource(tmp),
+                        ),
+                      ),
+                    );
+                    //return Text("暂无数据");
                   }
                 },
               ),
@@ -52,8 +66,10 @@ class MyProfileSource extends DataTableSource{
 
   var data;
 
+
   @override
   DataRow getRow(int index){
+    print(data);
     if(index>=data.length){
       return null;
     }
@@ -85,6 +101,7 @@ class MyProfileSource extends DataTableSource{
 
   @override
   int get rowCount {
+    if(data==null)return 0;
     return data.length;
   }
 

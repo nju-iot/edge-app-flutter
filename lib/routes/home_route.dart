@@ -19,6 +19,8 @@ class HomeRoute extends StatefulWidget{
 ///主界面,暂时先这样
 class _HomeRouteState extends State<HomeRoute>{
 
+  String dropDownValue = '服务器1';
+
   @override
   Widget build(BuildContext context){
     Future<Null> _onrefresh(){
@@ -38,7 +40,6 @@ class _HomeRouteState extends State<HomeRoute>{
 
   Widget _buildBody(){
 
-    String dropDownValue = 'One';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,7 +72,7 @@ class _HomeRouteState extends State<HomeRoute>{
                                   dropDownValue = newValue;
                                 });
                               },
-                              items: <String>['One', 'Two', 'Free', 'Four']
+                              items: <String>['服务器1', '服务器2', '服务器3', '服务器4']
                                   .map<DropdownMenuItem<String>>((String value) {
                                 return DropdownMenuItem<String>(
                                   value: value,

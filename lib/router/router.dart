@@ -36,7 +36,6 @@ class MyRouter {
   static ExtendedNavigatorState get navigator => ExtendedNavigator.root;
 
   static void push(String routeName) {
-    //print(routeName);
     navigator.push(routeName);
   }
 

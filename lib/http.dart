@@ -68,4 +68,17 @@ class MyHttp{
   }
 
 
+  //put请求
+  static Future putJson(String url,[Map<String,dynamic> data]) async{
+    Response response = await dio.put(url,data:data);
+    return response.data;
+  }
+
+  //delete请求
+  static Future delete(String url) async{
+    Response response = await dio.delete(url);
+    return response.data;
+  }
+
+
 }

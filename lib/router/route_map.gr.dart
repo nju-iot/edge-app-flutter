@@ -9,6 +9,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
+import '../page/device/device_add.dart';
 import '../page/device/device_info.dart';
 import '../page/device/device_page.dart';
 import '../page/interval/interval_page.dart';
@@ -36,6 +37,7 @@ class Routes {
   static const String _deviceInfoPage = '/page/device/device_info/:name';
   static String deviceInfoPage({@required dynamic name}) =>
       '/page/device/device_info/$name';
+  static const String deviceAddPage = '/page/device/device_add';
   static const all = <String>{
     indexPage,
     homeRoute,
@@ -48,6 +50,7 @@ class Routes {
     noticePage,
     rulesPage,
     _deviceInfoPage,
+    deviceAddPage,
   };
 }
 
@@ -66,6 +69,7 @@ class RouterMap extends RouterBase {
     RouteDef(Routes.noticePage, page: NoticePage),
     RouteDef(Routes.rulesPage, page: RulesPage),
     RouteDef(Routes._deviceInfoPage, page: DeviceInfoPage),
+    RouteDef(Routes.deviceAddPage, page: DeviceAddPage),
   ];
   @override
   Map<Type, AutoRouteFactory> get pagesMap => _pagesMap;
@@ -159,6 +163,17 @@ class RouterMap extends RouterBase {
       return PageRouteBuilder<dynamic>(
         pageBuilder: (context, animation, secondaryAnimation) =>
             DeviceInfoPage(name: data.pathParams['name'].stringValue),
+        settings: data,
+        opaque: false,
+        barrierDismissible: false,
+        transitionsBuilder: getTransitions,
+        transitionDuration: const Duration(milliseconds: 800),
+      );
+    },
+    DeviceAddPage: (data) {
+      return PageRouteBuilder<dynamic>(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            DeviceAddPage(),
         settings: data,
         opaque: false,
         barrierDismissible: false,

@@ -1,6 +1,7 @@
 //占坑，页面多的时候，考虑弄一个页面路由映射表来管理页面
 import 'package:auto_route/auto_route_annotations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/page/device/device_add.dart';
 import 'package:flutter_app/page/device/device_info.dart';
 import 'package:flutter_app/page/device/device_page.dart';
 import 'package:flutter_app/page/interval/interval_page.dart';
@@ -27,6 +28,7 @@ import 'package:flutter_app/routes/user_route.dart';
     CustomRoute(page:NoticePage,path:'/page/notification/notice_page'),
     CustomRoute(page:RulesPage,path:'/page/rule/rules_page'),
     AutoRoute(page:DeviceInfoPage,path:'/page/device/device_info/:name'),
+    AutoRoute(page:DeviceAddPage,path:'/page/device/device_add'),
   ],
     routesClassName: 'Routes',
     transitionsBuilder: getTransitions,

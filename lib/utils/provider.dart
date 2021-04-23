@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/utils/SPUtils.dart';
 import 'package:provider/provider.dart';
 
-//使用Provider来实现状态管理
+//使用Provider来做状态管理,主要是主界面的切换
 
 
 //状态管理
@@ -15,9 +15,8 @@ class Store {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppTheme(getDefaultTheme())),
-        //ChangeNotifierProvider.value(value: LocaleModel(SPUtils.getLocale())),
-        //ChangeNotifierProvider.value(value: UserProfile(SPUtils.getNickName())),
         ChangeNotifierProvider.value(value: AppStatus(TAB_HOME_EDGE_INDEX)),
+        //ChangeNotifierProvider.value(value: ProtocolStatus('mqtt')),
       ],
       child: child,
     );
@@ -98,3 +97,20 @@ class AppStatus with ChangeNotifier{
     notifyListeners();
   }
 }
+
+/*class ProtocolStatus with ChangeNotifier{
+  String _value;
+  ProtocolStatus(this._value);
+
+  String get value => _value;
+
+  set value(String newValue){
+    _value = newValue;
+    //notifyListeners();
+    Future.delayed(Duration(milliseconds: 200)).then((e){
+      notifyListeners();
+    });
+  }
+
+
+}*/
