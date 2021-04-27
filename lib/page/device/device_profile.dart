@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/http.dart';
 
@@ -10,11 +11,21 @@ class DeviceProfilePage extends StatefulWidget{
 var tmp;
 class _DeviceProfilePageState extends State<DeviceProfilePage>{
 
+  /*var result;
+
+  void getRequest() async{
+    Dio dio = new Dio();
+    Response response = await dio.get('http://47.102.192.194:4000/rule-engine/rules');
+    setState(() {
+      result = response.data;
+    });
+  }*/
+
   @override
   Widget build(BuildContext context){
     //var tmp;
     return Scaffold(
-        body:Column(
+        body:ListView(
             children:<Widget>[
               FutureBuilder(
                 future:MyHttp.get('http://47.102.192.194:48081/api/v1/deviceprofile'),
@@ -22,7 +33,7 @@ class _DeviceProfilePageState extends State<DeviceProfilePage>{
                   if(snapshot.hasData){
                     tmp = snapshot.data;
                     return Container(
-                          child:Expanded(
+                          //child:Expanded(
                             child:PaginatedDataTable(
                               rowsPerPage: 6,
                               header: Text("DeviceProfile"),
@@ -32,11 +43,11 @@ class _DeviceProfilePageState extends State<DeviceProfilePage>{
                               columns: [DataColumn(label:Text("设备描述信息"))],
                               source: MyProfileSource(tmp),
                             ),
-                          ),
+                          //),
                     );
                   }else{
                     return Container(
-                      child:Expanded(
+                      //child:Expanded(
                         child:PaginatedDataTable(
                           rowsPerPage: 1,
                           header: Text("DeviceProfile"),
@@ -46,7 +57,7 @@ class _DeviceProfilePageState extends State<DeviceProfilePage>{
                           columns: [DataColumn(label:Text("设备描述信息"))],
                           source: MyProfileSource(tmp),
                         ),
-                      ),
+                      //),
                     );
                     //return Text("暂无数据");
                   }
@@ -69,7 +80,6 @@ class MyProfileSource extends DataTableSource{
 
   @override
   DataRow getRow(int index){
-    print(data);
     if(index>=data.length){
       return null;
     }

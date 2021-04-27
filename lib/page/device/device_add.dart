@@ -1,6 +1,7 @@
 
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/http.dart';
 import 'package:flutter_app/page/device/device_info.dart';
@@ -14,6 +15,7 @@ Map<String,dynamic> postTmp;
 String currentProtocol;
 String currentService;
 String currentProfile;
+
 
 
 class DeviceAddPage extends StatefulWidget{
@@ -97,7 +99,26 @@ class _DeviceAddPageState extends State<DeviceAddPage>{
         postTmp['protocols'] = {currentProtocol:allProtocols[currentProtocol]};
         postTmp['service']['name'] = currentService;
         postTmp['profile']['name'] = currentProfile;
-        MyHttp.postJson('http://47.102.192.194:48081/api/v1/device',postTmp);
+        MyHttp.postJson('http://47.102.192.194:48081/api/v1/device',postTmp).catchError((error){
+          print(error);
+          return showDialog<bool>(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('提示'),
+                  content: Text('添加失败，请检查网络状况或设备信息格式'),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('确认'),
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                      },
+                    ),
+                  ],
+                );
+              }
+          );
+        });
         _form.save();
         //Navigator.of(context).pop(true);
         MyRouter.push(Routes.devicePage);

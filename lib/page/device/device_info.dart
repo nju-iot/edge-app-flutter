@@ -82,7 +82,26 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
         postTmp['protocols'] = tmp['protocols'];
         postTmp['service']['name'] = tmp['service']['name'];
         postTmp['profile']['name'] = tmp['profile']['name'];//不属于表单的数据也和表单一起，封装提交
-        MyHttp.putJson('http://47.102.192.194:48081/api/v1/device',postTmp);
+        MyHttp.putJson('http://47.102.192.194:48081/api/v1/device',postTmp).catchError((error){
+          print(error);
+          return showDialog<bool>(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('提示'),
+                  content: Text('修改失败，请检查网络状况或设备信息格式'),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('确认'),
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                      },
+                    ),
+                  ],
+                );
+              }
+          );
+        });
         _form.save();
         Navigator.of(context).pop(true);
       }

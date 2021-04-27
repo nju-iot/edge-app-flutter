@@ -13,7 +13,7 @@ class _DeviceServicePageState extends State<DeviceServicePage>{
   Widget build(BuildContext context){
     var tmp;
     return Scaffold(
-        body: Column(
+        body: ListView(
             children:<Widget>[
               FutureBuilder(
                 future:MyHttp.get('http://47.102.192.194:48081/api/v1/deviceservice'),
@@ -21,20 +21,29 @@ class _DeviceServicePageState extends State<DeviceServicePage>{
                   if(snapshot.hasData){
                     tmp = snapshot.data;
                     return Container(
-                          child:Expanded(
-                            child:PaginatedDataTable(
-                              rowsPerPage: 6,
-                              header: Text("DeviceService"),
-                              headingRowHeight: 24.0,
-                              horizontalMargin: 8.0,
-                              dataRowHeight: 60.0,
-                              columns: [DataColumn(label:Text("设备服务信息"))],
-                              source: MyServiceSource(tmp),
-                            ),
-                          ),
+                      child:PaginatedDataTable(
+                        rowsPerPage: 6,
+                        header: Text("DeviceService"),
+                        headingRowHeight: 24.0,
+                        horizontalMargin: 8.0,
+                        dataRowHeight: 60.0,
+                        columns: [DataColumn(label:Text("设备服务信息"))],
+                        source: MyServiceSource(tmp),
+                      ),
                     );
                   }else{
-                    return Text("暂无数据");
+                    return Container(
+                        child:PaginatedDataTable(
+                          rowsPerPage: 1,
+                          header: Text("DeviceService"),
+                          headingRowHeight: 24.0,
+                          horizontalMargin: 8.0,
+                          dataRowHeight: 60.0,
+                          columns: [DataColumn(label:Text("设备服务信息"))],
+                          source: MyServiceSource(tmp),
+                        ),
+                    );
+                    //return Text("暂无数据");
                   }
                 },
               ),
@@ -85,6 +94,7 @@ class MyServiceSource extends DataTableSource{
 
   @override
   int get rowCount {
+    if(data==null) return 0;
     return data.length;
   }
 

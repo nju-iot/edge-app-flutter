@@ -8,8 +8,8 @@ class MyHttp{
   //使用Dio来处理网络请求
   static final Dio dio = Dio(
     BaseOptions(
-      connectTimeout:5000,
-      receiveTimeout:3000,
+      connectTimeout:8000,
+      receiveTimeout:5000,
     )
   );
 

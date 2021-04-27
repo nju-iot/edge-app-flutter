@@ -6,6 +6,8 @@ import 'package:flutter_app/router/router.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'dart:math' as math;
 
+
+
 class DeviceListPage extends StatefulWidget{
   @override
   DeviceListPageState createState() => DeviceListPageState();
@@ -49,7 +51,7 @@ class DeviceListPageState extends State<DeviceListPage>{
             },
           ),
           body:FloatingSearchBar(
-              hint: '搜索...',
+              hint: '请输入设备名称',
               scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
               transitionDuration: const Duration(milliseconds: 800),
               transitionCurve: Curves.easeInOut,
@@ -59,6 +61,7 @@ class DeviceListPageState extends State<DeviceListPage>{
               maxWidth: isPortrait ? 600 : 500,
               debounceDelay: const Duration(milliseconds: 500),
               onQueryChanged: (query) {
+                print('szz');
                 //MyRouter.push(Routes.deviceInfoPage(name:"${tmp[index]['name'].toString()}"));
                 // Call your model, bloc, controller here.
               },
@@ -136,7 +139,11 @@ class DeviceListPageState extends State<DeviceListPage>{
                                 )
                             );
                           }else{
-                            return Center(child:Text("未搜索到结果，请刷新页面或重试"));
+                            return Container(
+                                alignment: Alignment.topCenter,
+                                margin:const EdgeInsets.only(top:70.0),
+                                child:Text("未搜索到结果，请刷新页面或重试")
+                            );
                           }
                         },
                       ),
