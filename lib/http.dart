@@ -8,8 +8,9 @@ class MyHttp{
   //使用Dio来处理网络请求
   static final Dio dio = Dio(
     BaseOptions(
-      connectTimeout:8000,
-      receiveTimeout:5000,
+      baseUrl:"http://106.14.157.113:6789",
+      connectTimeout:5000,
+      receiveTimeout:3000,
     )
   );
 

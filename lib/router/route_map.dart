@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/page/device/device_add.dart';
 import 'package:flutter_app/page/device/device_info.dart';
 import 'package:flutter_app/page/device/device_page.dart';
+import 'package:flutter_app/page/device/profile_info.dart';
+import 'package:flutter_app/page/device/service_info.dart';
 import 'package:flutter_app/page/interval/interval_page.dart';
 import 'package:flutter_app/page/notification/notice_page.dart';
 import 'package:flutter_app/page/page_index.dart';
@@ -29,6 +31,8 @@ import 'package:flutter_app/routes/user_route.dart';
     CustomRoute(page:RulesPage,path:'/page/rule/rules_page'),
     AutoRoute(page:DeviceInfoPage,path:'/page/device/device_info/:name'),
     AutoRoute(page:DeviceAddPage,path:'/page/device/device_add'),
+    AutoRoute(page:ServiceInfoPage,path:'/page/device/service_info/:name'),
+    AutoRoute(page:ProfileInfoPage,path:'/page/device/profile_info/:name'),
   ],
     routesClassName: 'Routes',
     transitionsBuilder: getTransitions,

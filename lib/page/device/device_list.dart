@@ -18,11 +18,18 @@ class DeviceListPageState extends State<DeviceListPage>{
 
 
   @override
+  void initState(){
+    super.initState();
+    setState(() {
+
+    });
+  }
+
+  @override
   Widget build(BuildContext context){
     Future<Null> _onrefresh(){
       return Future.delayed(Duration(seconds: 5),(){   // 延迟5s完成刷新
         setState(() {
-
         });
       });
     }
@@ -107,7 +114,7 @@ class DeviceListPageState extends State<DeviceListPage>{
                       //FloatingSearchBarScrollNotifier(
                       //child:
                       FutureBuilder(
-                        future:MyHttp.get('http://47.102.192.194:48081/api/v1/device'),
+                        future:MyHttp.get('/core-metadata/api/v1/device'),
                         builder: (BuildContext context,AsyncSnapshot snapshot){
                           if(snapshot.hasData){
                             tmp = snapshot.data;
@@ -157,9 +164,6 @@ class DeviceListPageState extends State<DeviceListPage>{
         ),
         onRefresh: _onrefresh,
     );
-
   }
-
-
 }
 

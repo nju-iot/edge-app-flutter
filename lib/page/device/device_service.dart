@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/http.dart';
+import 'package:flutter_app/router/route_map.gr.dart';
+import 'package:flutter_app/router/router.dart';
 
 class DeviceServicePage extends StatefulWidget{
   @override
@@ -16,17 +18,47 @@ class _DeviceServicePageState extends State<DeviceServicePage>{
         body: ListView(
             children:<Widget>[
               FutureBuilder(
-                future:MyHttp.get('http://47.102.192.194:48081/api/v1/deviceservice'),
+                future:MyHttp.get('/core-metadata/api/v1/deviceservice'),
                 builder: (BuildContext context,AsyncSnapshot snapshot){
                   if(snapshot.hasData){
                     tmp = snapshot.data;
                     return Container(
                       child:PaginatedDataTable(
-                        rowsPerPage: 6,
+                        rowsPerPage: tmp.length<=6?tmp.length:6,
                         header: Text("DeviceService"),
                         headingRowHeight: 24.0,
                         horizontalMargin: 8.0,
                         dataRowHeight: 60.0,
+                        actions:<Widget>[
+                          IconButton(
+                              icon: Icon(Icons.refresh),
+                              onPressed: (){
+                                setState(() {});
+                              }
+                          ),
+                          IconButton(
+                            icon:Icon(Icons.add),
+                            onPressed: () async{
+                              return await showDialog<bool>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('提示'),
+                                      content: Text('请在您当前的服务器上部署设备服务'),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          child: Text('确定'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop(true);
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  }
+                              );
+                            },
+                          ),
+                        ],
                         columns: [DataColumn(label:Text("设备服务信息"))],
                         source: MyServiceSource(tmp),
                       ),
@@ -39,6 +71,14 @@ class _DeviceServicePageState extends State<DeviceServicePage>{
                           headingRowHeight: 24.0,
                           horizontalMargin: 8.0,
                           dataRowHeight: 60.0,
+                          actions: <Widget>[
+                            IconButton(
+                                icon: Icon(Icons.refresh),
+                                onPressed: (){
+                                  setState(() {});
+                                }
+                            ),
+                          ],
                           columns: [DataColumn(label:Text("设备服务信息"))],
                           source: MyServiceSource(tmp),
                         ),
@@ -75,7 +115,12 @@ class MyServiceSource extends DataTableSource{
               //leading:Text("#${index+1}"),
               title:Text("${data[index]['name'].toString()}",style:TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text("id: ${data[index]['id'].toString()}"),
-              trailing:Icon(Icons.arrow_forward_ios),
+              trailing:IconButton(
+                  icon:Icon(Icons.arrow_forward_ios),
+                  onPressed: (){
+                    MyRouter.push(Routes.serviceInfoPage(name:"${data[index]['name'].toString()}"));
+                  },
+              ),
             ),
           ),
         ]
@@ -97,7 +142,6 @@ class MyServiceSource extends DataTableSource{
     if(data==null) return 0;
     return data.length;
   }
-
 }
 
 

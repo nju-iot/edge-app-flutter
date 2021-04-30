@@ -1,6 +1,3 @@
-
-import 'dart:convert';
-
 import 'package:auto_route/auto_route_annotations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +58,7 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
   @override
   void initState(){
 
-    _future = MyHttp.get('http://47.102.192.194:48081/api/v1/device/name/${widget.name}');
+    _future = MyHttp.get('/core-metadata/api/v1/device/name/${widget.name}');
     //_futureOfServices = MyHttp.get('http://47.102.192.194:48081/api/v1/deviceservice');
     //_futureOfProfiles = MyHttp.get('http://47.102.192.194:48081/api/v1/deviceprofile');
 
@@ -82,8 +79,8 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
         postTmp['protocols'] = tmp['protocols'];
         postTmp['service']['name'] = tmp['service']['name'];
         postTmp['profile']['name'] = tmp['profile']['name'];//不属于表单的数据也和表单一起，封装提交
-        MyHttp.putJson('http://47.102.192.194:48081/api/v1/device',postTmp).catchError((error){
-          print(error);
+        MyHttp.putJson('/core-metadata/api/v1/device',postTmp).catchError((error){
+          MyHttp.handleError(error);
           return showDialog<bool>(
               context: context,
               builder: (BuildContext context) {
@@ -130,8 +127,9 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
                           FlatButton(
                             child: Text('确认'),
                             onPressed: () {
-                              MyHttp.delete('http://47.102.192.194:48081/api/v1/device/name/${widget.name}');
-                              MyRouter.push(Routes.devicePage);
+                              MyHttp.delete('/core-metadata/api/v1/device/name/${widget.name}');
+                              Navigator.of(context).pop(true);
+                              Navigator.of(context).pop(true);
                             },
                           ),
                         ],
@@ -407,7 +405,7 @@ class _MyServiceInfoState extends State<MyServiceInfo>{
   @override
   Widget build(BuildContext context){
     return FutureBuilder(
-        future: MyHttp.get('http://47.102.192.194:48081/api/v1/deviceservice'),
+        future: MyHttp.get('/core-metadata/api/v1/deviceservice'),
         builder: (BuildContext context, AsyncSnapshot snapshot){
           if(snapshot.hasData){
             var temp = snapshot.data;
@@ -457,7 +455,7 @@ class _MyProfileInfoState extends State<MyProfileInfo>{
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: MyHttp.get('http://47.102.192.194:48081/api/v1/deviceprofile'),
+        future: MyHttp.get('/core-metadata/api/v1/deviceprofile'),
         builder: (BuildContext context, AsyncSnapshot snapshot){
           if(snapshot.hasData){
             var temp = snapshot.data;

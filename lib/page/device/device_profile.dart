@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/http.dart';
+import 'package:flutter_app/router/route_map.gr.dart';
+import 'package:flutter_app/router/router.dart';
 
 class DeviceProfilePage extends StatefulWidget{
   @override
@@ -11,16 +13,6 @@ class DeviceProfilePage extends StatefulWidget{
 var tmp;
 class _DeviceProfilePageState extends State<DeviceProfilePage>{
 
-  /*var result;
-
-  void getRequest() async{
-    Dio dio = new Dio();
-    Response response = await dio.get('http://47.102.192.194:4000/rule-engine/rules');
-    setState(() {
-      result = response.data;
-    });
-  }*/
-
   @override
   Widget build(BuildContext context){
     //var tmp;
@@ -28,18 +20,48 @@ class _DeviceProfilePageState extends State<DeviceProfilePage>{
         body:ListView(
             children:<Widget>[
               FutureBuilder(
-                future:MyHttp.get('http://47.102.192.194:48081/api/v1/deviceprofile'),
+                future:MyHttp.get('/core-metadata/api/v1/deviceprofile'),
                 builder: (BuildContext context,AsyncSnapshot snapshot){
                   if(snapshot.hasData){
                     tmp = snapshot.data;
                     return Container(
                           //child:Expanded(
                             child:PaginatedDataTable(
-                              rowsPerPage: 6,
+                              rowsPerPage: tmp.length<=6?tmp.length:6,
                               header: Text("DeviceProfile"),
                               headingRowHeight: 24.0,
                               horizontalMargin: 8.0,
                               dataRowHeight: 60.0,
+                              actions:<Widget>[
+                                IconButton(
+                                    icon: Icon(Icons.refresh),
+                                    onPressed: (){
+                                      setState(() {});
+                                    }
+                                ),
+                                IconButton(
+                                  icon:Icon(Icons.add),
+                                  onPressed: () async{
+                                    return await showDialog<bool>(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text('提示'),
+                                            content: Text('请在您当前的服务器上以yml文件形式导入设备描述文件'),
+                                            actions: <Widget>[
+                                              FlatButton(
+                                                child: Text('确定'),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop(true);
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                    );
+                                  },
+                                ),
+                              ],
                               columns: [DataColumn(label:Text("设备描述信息"))],
                               source: MyProfileSource(tmp),
                             ),
@@ -54,6 +76,14 @@ class _DeviceProfilePageState extends State<DeviceProfilePage>{
                           headingRowHeight: 24.0,
                           horizontalMargin: 8.0,
                           dataRowHeight: 60.0,
+                          actions:<Widget>[
+                            IconButton(
+                              icon: Icon(Icons.refresh),
+                              onPressed: (){
+                                setState(() {});
+                              }
+                            ),
+                          ],
                           columns: [DataColumn(label:Text("设备描述信息"))],
                           source: MyProfileSource(tmp),
                         ),
@@ -92,7 +122,12 @@ class MyProfileSource extends DataTableSource{
               //leading:Text("#${index+1}"),
               title:Text("${data[index]['name'].toString()}",style:TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text("id: ${data[index]['id'].toString()}"),
-              trailing:Icon(Icons.arrow_forward_ios),
+              trailing:IconButton(
+                icon:Icon(Icons.arrow_forward_ios),
+                onPressed: (){
+                  MyRouter.push(Routes.profileInfoPage(name:"${data[index]['name'].toString()}"));
+                },
+              ),
             ),
           ),
         ]

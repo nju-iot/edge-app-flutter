@@ -1,15 +1,10 @@
-
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/http.dart';
 import 'package:flutter_app/page/device/device_info.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
-import 'package:flutter_app/utils/provider.dart';
 import 'package:http/http.dart';
-import 'package:provider/provider.dart';
 
 Map<String,dynamic> postTmp;
 String currentProtocol;
@@ -24,14 +19,8 @@ class DeviceAddPage extends StatefulWidget{
 }
 
 class _DeviceAddPageState extends State<DeviceAddPage>{
-
-  //Map<String,dynamic> postTmp;
-  //var currentProtocol = 'mqtt';
-
-
   Future<dynamic> _futureOfServices;
   Future<dynamic> _futureOfProfiles;
-
 
   Map<String,dynamic> allProtocols = {
     "mqtt": {
@@ -62,22 +51,19 @@ class _DeviceAddPageState extends State<DeviceAddPage>{
     "other": {}
   };
 
-
   @override
   void initState(){
-    _futureOfServices = MyHttp.get('http://47.102.192.194:48081/api/v1/deviceservice');
-    _futureOfProfiles = MyHttp.get('http://47.102.192.194:48081/api/v1/deviceprofile');
+    _futureOfServices = MyHttp.get('/core-metadata/api/v1/deviceservice');
+    _futureOfProfiles = MyHttp.get('/core-metadata/api/v1/deviceprofile');
 
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context){
 
     GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-    //var currentProtocol = 'mqtt';
     postTmp = {
       'name':'',
       'description':'',
@@ -99,8 +85,8 @@ class _DeviceAddPageState extends State<DeviceAddPage>{
         postTmp['protocols'] = {currentProtocol:allProtocols[currentProtocol]};
         postTmp['service']['name'] = currentService;
         postTmp['profile']['name'] = currentProfile;
-        MyHttp.postJson('http://47.102.192.194:48081/api/v1/device',postTmp).catchError((error){
-          print(error);
+        MyHttp.postJson('/core-metadata/api/v1/device',postTmp).catchError((error){
+          MyHttp.handleError(error);
           return showDialog<bool>(
               context: context,
               builder: (BuildContext context) {
@@ -120,8 +106,8 @@ class _DeviceAddPageState extends State<DeviceAddPage>{
           );
         });
         _form.save();
-        //Navigator.of(context).pop(true);
-        MyRouter.push(Routes.devicePage);
+        Navigator.of(context).pop(true);
+        //MyRouter.replace(Routes.devicePage);
       }
     }
 
@@ -213,23 +199,6 @@ class _DeviceAddPageState extends State<DeviceAddPage>{
 
                             Text("操作状态",style:TextStyle(color:Colors.black,fontSize: 14)),
                             MyOperatingInfo(postTmp,operatingState),
-                            /*DropdownButton<String>(
-                              value:operatingState,
-                              onChanged: (String newValue) {
-                                setState(() {
-                                  postTmp['operatingState'] = newValue == "可操作"?"ENABLED":"DISABLED";
-                                  operatingState = newValue;
-                                });
-                              },
-                              items: <String>['可操作','不可操作']
-                                  .map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                            ),*/
-
                           ]
                       ),
                       onWillPop: () async{
@@ -408,9 +377,6 @@ class _MyAddProfileState extends State<MyAddProfile>{
   }
 
 }
-
-
-
 
 
 

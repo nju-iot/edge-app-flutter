@@ -12,6 +12,8 @@ import 'package:flutter/material.dart';
 import '../page/device/device_add.dart';
 import '../page/device/device_info.dart';
 import '../page/device/device_page.dart';
+import '../page/device/profile_info.dart';
+import '../page/device/service_info.dart';
 import '../page/interval/interval_page.dart';
 import '../page/notification/notice_page.dart';
 import '../page/page_index.dart';
@@ -38,6 +40,12 @@ class Routes {
   static String deviceInfoPage({@required dynamic name}) =>
       '/page/device/device_info/$name';
   static const String deviceAddPage = '/page/device/device_add';
+  static const String _serviceInfoPage = '/page/device/service_info/:name';
+  static String serviceInfoPage({@required dynamic name}) =>
+      '/page/device/service_info/$name';
+  static const String _profileInfoPage = '/page/device/profile_info/:name';
+  static String profileInfoPage({@required dynamic name}) =>
+      '/page/device/profile_info/$name';
   static const all = <String>{
     indexPage,
     homeRoute,
@@ -51,6 +59,8 @@ class Routes {
     rulesPage,
     _deviceInfoPage,
     deviceAddPage,
+    _serviceInfoPage,
+    _profileInfoPage,
   };
 }
 
@@ -70,6 +80,8 @@ class RouterMap extends RouterBase {
     RouteDef(Routes.rulesPage, page: RulesPage),
     RouteDef(Routes._deviceInfoPage, page: DeviceInfoPage),
     RouteDef(Routes.deviceAddPage, page: DeviceAddPage),
+    RouteDef(Routes._serviceInfoPage, page: ServiceInfoPage),
+    RouteDef(Routes._profileInfoPage, page: ProfileInfoPage),
   ];
   @override
   Map<Type, AutoRouteFactory> get pagesMap => _pagesMap;
@@ -174,6 +186,28 @@ class RouterMap extends RouterBase {
       return PageRouteBuilder<dynamic>(
         pageBuilder: (context, animation, secondaryAnimation) =>
             DeviceAddPage(),
+        settings: data,
+        opaque: false,
+        barrierDismissible: false,
+        transitionsBuilder: getTransitions,
+        transitionDuration: const Duration(milliseconds: 800),
+      );
+    },
+    ServiceInfoPage: (data) {
+      return PageRouteBuilder<dynamic>(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            ServiceInfoPage(data.pathParams['name'].stringValue),
+        settings: data,
+        opaque: false,
+        barrierDismissible: false,
+        transitionsBuilder: getTransitions,
+        transitionDuration: const Duration(milliseconds: 800),
+      );
+    },
+    ProfileInfoPage: (data) {
+      return PageRouteBuilder<dynamic>(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            ProfileInfoPage(data.pathParams['name'].stringValue),
         settings: data,
         opaque: false,
         barrierDismissible: false,

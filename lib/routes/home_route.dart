@@ -114,7 +114,7 @@ class _HomeRouteState extends State<HomeRoute>{
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children:<Widget>[
                                   FutureBuilder(
-                                    future:MyHttp.get('http://47.102.192.194:48081/api/v1/device'),
+                                    future:MyHttp.get('/core-metadata/api/v1/device'),
                                     builder: (BuildContext context,AsyncSnapshot snapshot){
                                       if(snapshot.hasData){
                                         var tmp = snapshot.data;
