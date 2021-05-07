@@ -16,6 +16,9 @@ import '../page/device/profile_info.dart';
 import '../page/device/service_info.dart';
 import '../page/interval/interval_page.dart';
 import '../page/notification/notice_page.dart';
+import '../page/notification/notification_info.dart';
+import '../page/notification/subscription_add.dart';
+import '../page/notification/subscription_info.dart';
 import '../page/page_index.dart';
 import '../page/rule/rules_page.dart';
 import '../page/settings.dart';
@@ -46,6 +49,14 @@ class Routes {
   static const String _profileInfoPage = '/page/device/profile_info/:name';
   static String profileInfoPage({@required dynamic name}) =>
       '/page/device/profile_info/$name';
+  static const String _subInfoPage = '/page/notification/sub_info/:id';
+  static String subInfoPage({@required dynamic id}) =>
+      '/page/notification/sub_info/$id';
+  static const String _notificationInfoPage =
+      '/page/notification/notification_info/:slug';
+  static String notificationInfoPage({@required dynamic slug}) =>
+      '/page/notification/notification_info/$slug';
+  static const String subAddPage = '/page/notification/subscription_add';
   static const all = <String>{
     indexPage,
     homeRoute,
@@ -61,6 +72,9 @@ class Routes {
     deviceAddPage,
     _serviceInfoPage,
     _profileInfoPage,
+    _subInfoPage,
+    _notificationInfoPage,
+    subAddPage,
   };
 }
 
@@ -82,6 +96,9 @@ class RouterMap extends RouterBase {
     RouteDef(Routes.deviceAddPage, page: DeviceAddPage),
     RouteDef(Routes._serviceInfoPage, page: ServiceInfoPage),
     RouteDef(Routes._profileInfoPage, page: ProfileInfoPage),
+    RouteDef(Routes._subInfoPage, page: SubInfoPage),
+    RouteDef(Routes._notificationInfoPage, page: NotificationInfoPage),
+    RouteDef(Routes.subAddPage, page: SubAddPage),
   ];
   @override
   Map<Type, AutoRouteFactory> get pagesMap => _pagesMap;
@@ -208,6 +225,38 @@ class RouterMap extends RouterBase {
       return PageRouteBuilder<dynamic>(
         pageBuilder: (context, animation, secondaryAnimation) =>
             ProfileInfoPage(data.pathParams['name'].stringValue),
+        settings: data,
+        opaque: false,
+        barrierDismissible: false,
+        transitionsBuilder: getTransitions,
+        transitionDuration: const Duration(milliseconds: 800),
+      );
+    },
+    SubInfoPage: (data) {
+      return PageRouteBuilder<dynamic>(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            SubInfoPage(data.pathParams['id'].stringValue),
+        settings: data,
+        opaque: false,
+        barrierDismissible: false,
+        transitionsBuilder: getTransitions,
+        transitionDuration: const Duration(milliseconds: 800),
+      );
+    },
+    NotificationInfoPage: (data) {
+      return PageRouteBuilder<dynamic>(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            NotificationInfoPage(data.pathParams['slug'].stringValue),
+        settings: data,
+        opaque: false,
+        barrierDismissible: false,
+        transitionsBuilder: getTransitions,
+        transitionDuration: const Duration(milliseconds: 800),
+      );
+    },
+    SubAddPage: (data) {
+      return PageRouteBuilder<dynamic>(
+        pageBuilder: (context, animation, secondaryAnimation) => SubAddPage(),
         settings: data,
         opaque: false,
         barrierDismissible: false,

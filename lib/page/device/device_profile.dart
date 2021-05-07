@@ -1,16 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/http.dart';
+import 'package:flutter_app/page/notification/notice_notification.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
 
+var tmp;
+List<String> willBeDeleted = [];
 class DeviceProfilePage extends StatefulWidget{
   @override
   _DeviceProfilePageState createState() => _DeviceProfilePageState();
 
 }
 
-var tmp;
 class _DeviceProfilePageState extends State<DeviceProfilePage>{
 
   @override
@@ -24,6 +26,9 @@ class _DeviceProfilePageState extends State<DeviceProfilePage>{
                 builder: (BuildContext context,AsyncSnapshot snapshot){
                   if(snapshot.hasData){
                     tmp = snapshot.data;
+                    for(int i=0;i<tmp.length;i++){
+                      tmp[i]['selected'] = false;
+                    }
                     return Container(
                           //child:Expanded(
                             child:PaginatedDataTable(
@@ -36,7 +41,9 @@ class _DeviceProfilePageState extends State<DeviceProfilePage>{
                                 IconButton(
                                     icon: Icon(Icons.refresh),
                                     onPressed: (){
-                                      setState(() {});
+                                      setState(() {
+                                        willBeDeleted = [];
+                                      });
                                     }
                                 ),
                                 IconButton(
@@ -52,6 +59,38 @@ class _DeviceProfilePageState extends State<DeviceProfilePage>{
                                               FlatButton(
                                                 child: Text('确定'),
                                                 onPressed: () {
+                                                  Navigator.of(context).pop(true);
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                    );
+                                  },
+                                ),
+                                IconButton(
+                                  icon:Icon(Icons.delete),
+                                  onPressed:() async{
+                                    return await showDialog<bool>(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text('提示'),
+                                            content: Text('是否要删除选定的文件？'),
+                                            actions: <Widget>[
+                                              FlatButton(
+                                                child: Text('取消'),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop(true);
+                                                },
+                                              ),
+                                              FlatButton(
+                                                child: Text('确认'),
+                                                onPressed: () {
+                                                  for(int i=0;i<willBeDeleted.length;i++){
+                                                    MyHttp.delete('/core-metadata/api/v1/deviceprofile/id/${willBeDeleted[i]}');
+                                                  }
+                                                  willBeDeleted = [];
                                                   Navigator.of(context).pop(true);
                                                 },
                                               ),
@@ -113,8 +152,19 @@ class MyProfileSource extends DataTableSource{
     if(index>=data.length){
       return null;
     }
+
     return DataRow.byIndex(
         index:index,
+        selected: data[index]['selected'],
+        onSelectChanged: (selected) {
+          data[index]['selected'] = selected;
+          if(selected==true){
+            willBeDeleted.add(data[index]['id']);
+          }else{
+            willBeDeleted.remove(data[index]['id']);
+          }
+          notifyListeners();
+        },
         cells:[
           DataCell(
             ListTile(

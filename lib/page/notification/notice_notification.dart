@@ -1,7 +1,16 @@
 
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/router/route_map.gr.dart';
+import 'package:flutter_app/router/router.dart';
 
 import '../../http.dart';
+
+
+List<String> willBeDeleted = [];
+var tmp;
+//bool searched = true;
+//var items = [];
 
 class NotificationPage extends StatefulWidget{
 
@@ -11,7 +20,9 @@ class NotificationPage extends StatefulWidget{
 }
 
 class _NotificationPageState extends State<NotificationPage>{
-  var tmp;
+  DateTime _selectStart = DateTime.now();
+  DateTime _selectEnd = DateTime.now();
+  //var tmp;
 
   @override
   Widget build(BuildContext context) {
@@ -23,65 +34,16 @@ class _NotificationPageState extends State<NotificationPage>{
                 builder: (BuildContext context,AsyncSnapshot snapshot){
                   if(snapshot.hasData){
                     tmp = snapshot.data;
-                    return Container(
-                      //child:Expanded(
-                      child:PaginatedDataTable(
-                        rowsPerPage: tmp.length<=6?tmp.length:6,
-                        header: Text("Notifications"),
-                        headingRowHeight: 24.0,
-                        horizontalMargin: 8.0,
-                        dataRowHeight: 60.0,
-                        actions:<Widget>[
-                          IconButton(
-                              icon: Icon(Icons.refresh),
-                              onPressed: (){
-                                setState(() {});
-                              }
-                          ),
-                          IconButton(
-                            icon:Icon(Icons.delete),
-                            onPressed:() async{
-                              return await showDialog<bool>(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text('提示'),
-                                      content: Text('是否要删除选定的消息？'),
-                                      actions: <Widget>[
-                                        FlatButton(
-                                          child: Text('取消'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop(true);
-                                          },
-                                        ),
-                                        FlatButton(
-                                          child: Text('确认'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop(true);
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  }
-                              );
-                            },
-                          ),
-                          IconButton(
-                            icon:Icon(Icons.search),
-                            onPressed: (){},
-                          ),
-                        ],
-                        columns: [DataColumn(label:Text("提醒消息"))],
-                        source: MyNotificationSource(tmp),
-                      ),
-                      //),
-                    );
+                    for(int i=0;i<tmp.length;i++){
+                      tmp[i]['selected'] = false;
+                    }
+                    return NoticeListBaseWidget(tmp);
                   }else{
                     return Container(
                       //child:Expanded(
                       child:PaginatedDataTable(
                         rowsPerPage: 1,
-                        header: Text("Notifications"),
+                        header: Text("提醒消息"),
                         headingRowHeight: 24.0,
                         horizontalMargin: 8.0,
                         dataRowHeight: 60.0,
@@ -93,7 +55,7 @@ class _NotificationPageState extends State<NotificationPage>{
                               }
                           ),
                         ],
-                        columns: [DataColumn(label:Text("提醒消息"))],
+                        columns: [DataColumn(label:Text("由新到旧（仅展示最近50条）"))],
                         source: MyNotificationSource(tmp),
                       ),
                       //),
@@ -102,7 +64,6 @@ class _NotificationPageState extends State<NotificationPage>{
                   }
                 },
               ),
-
             ]
         )
     );
@@ -117,7 +78,6 @@ class MyNotificationSource extends DataTableSource{
 
   @override
   DataRow getRow(int index){
-    //print(data[1]['created'].runtimeType);
     if(index>=data.length){
       return null;
     }
@@ -129,6 +89,16 @@ class MyNotificationSource extends DataTableSource{
     );
     return DataRow.byIndex(
         index:index,
+        selected: data[index]['selected'],
+        onSelectChanged: (selected) {
+          data[index]['selected'] = selected;
+          if(selected==true){
+            willBeDeleted.add(data[index]['slug']);
+          }else{
+            willBeDeleted.remove(data[index]['slug']);
+          }
+          notifyListeners();
+        },
         cells:[
           DataCell(
             ListTile(
@@ -136,7 +106,12 @@ class MyNotificationSource extends DataTableSource{
               //leading:Text("#${index+1}"),
               title:Text("${data[index]['slug'].toString()}",style:TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text("id: ${data[index]['id'].toString()}"),
-              trailing:Icon(Icons.arrow_forward_ios),
+              trailing:IconButton(
+                icon:Icon(Icons.arrow_forward_ios),
+                onPressed: (){
+                  MyRouter.push(Routes.notificationInfoPage(slug: "${data[index]['slug'].toString()}"));
+                },
+              ),
             ),
           ),
         ]
@@ -160,3 +135,218 @@ class MyNotificationSource extends DataTableSource{
   }
 
 }
+
+class NoticeListBaseWidget extends StatefulWidget{
+
+  var data;
+  NoticeListBaseWidget(this.data);
+
+  @override
+  _NoticeListState createState() => _NoticeListState();
+
+}
+
+class _NoticeListState extends State<NoticeListBaseWidget>{
+  var temp;
+  bool searched = false;
+
+  DateTime _selectStart = DateTime.now();
+  DateTime _selectEnd = DateTime.now();
+
+  @override
+  Widget build(BuildContext context) {
+
+    _showStartPicker() {
+      showDatePicker(
+        context: context,
+        initialDate: _selectStart, //选中的日期
+        firstDate: DateTime(1970), //日期选择器上可选择的最早日期
+        lastDate: DateTime(2030), //日期选择器上可选择的最晚日期
+      ).then((selectedValue) {
+        setState(() {
+          if(selectedValue!=null) {
+            _selectStart = selectedValue;
+          }
+        });
+      });
+    }
+
+    _showEndPicker() {
+      showDatePicker(
+        context: context,
+        initialDate: _selectEnd, //选中的日期
+        firstDate: DateTime(1970), //日期选择器上可选择的最早日期
+        lastDate: DateTime(2030), //日期选择器上可选择的最晚日期
+      ).then((selectedValue) {
+        setState(() {
+          if(selectedValue!=null){
+            _selectEnd = selectedValue;
+          }
+        });
+      });
+    }
+
+          return Container(
+            //child:Expanded(
+            child:PaginatedDataTable(
+              rowsPerPage: searched==true?(temp.length==0?1:temp.length<=6?temp.length:6):(tmp.length<=6?tmp.length:6),
+              header: Text("提醒消息"),
+              headingRowHeight: 24.0,
+              horizontalMargin: 8.0,
+              dataRowHeight: 60.0,
+              actions:<Widget>[
+                IconButton(
+                    icon: Icon(Icons.refresh),
+                    onPressed: (){
+                      setState(() {
+                        searched = false;
+                        _selectStart = DateTime.now();
+                        _selectEnd = DateTime.now();
+                        willBeDeleted = [];
+                      });
+                    }
+                ),
+                IconButton(
+                  icon:Icon(Icons.delete),
+                  onPressed:() async{
+                    return await showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('提示'),
+                            content: Text('是否要删除选定的消息？'),
+                            actions: <Widget>[
+                              FlatButton(
+                                child: Text('取消'),
+                                onPressed: () {
+                                  Navigator.of(context).pop(true);
+                                },
+                              ),
+                              FlatButton(
+                                child: Text('确认'),
+                                onPressed: () {
+                                  for(int i=0;i<willBeDeleted.length;i++){
+                                    MyHttp.delete('/support-notification/api/v1/notification/slug/${willBeDeleted[i]}');
+                                  }
+                                  willBeDeleted = [];
+                                  Navigator.of(context).pop(true);
+                                },
+                              ),
+                            ],
+                          );
+                        }
+                    );
+                  },
+                ),
+                IconButton(
+                  icon:Icon(Icons.search),
+                  onPressed: () {
+                    return showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return SimpleDialog(
+                            title:Text('按时间筛选'),
+                            children: <Widget>[
+                              SimpleDialogOption(
+                                child: InkWell(
+                                  onTap:(){
+                                    _showStartPicker();
+                                  },
+                                  child:Text.rich(TextSpan(
+                                      children:[
+                                        TextSpan(
+                                          text:"起始: ",
+                                          style:TextStyle(
+                                            color:Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize:14,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text:formatDate(_selectStart, [yyyy, "-", mm, "-", "dd"]),
+                                          style:TextStyle(
+                                            color:Colors.blue,
+                                            fontSize:14,
+                                          ),
+                                        )
+                                      ]
+                                  )),
+                                ),
+                                /*onPressed: () {
+                                  _showStartPicker();
+                                  //print(_selectStart.millisecondsSinceEpoch);
+                                },*/
+                              ),
+                              SimpleDialogOption(
+                                child: InkWell(
+                                  onTap:(){
+                                    _showEndPicker();
+                                  },
+                                  child:Text.rich(TextSpan(
+                                      children:[
+                                        TextSpan(
+                                          text:"截至: ",
+                                          style:TextStyle(
+                                            color:Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize:14,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text:formatDate(_selectEnd, [yyyy, "-", mm, "-", "dd"]),
+                                          style:TextStyle(
+                                            color:Colors.blue,
+                                            fontSize:14,
+                                          ),
+                                        )
+                                      ]
+                                  )),
+                                ),
+                                /*onPressed: () {
+                                  _showEndPicker();
+                                  //print(_selectEnd.millisecondsSinceEpoch);
+                                },*/
+                              ),
+                              Container(
+                                  width:60.0,
+                                  child:SizedBox(
+                                      width:60.0,
+                                      child:FlatButton(
+                                        //color: Colors.blue,
+                                        textColor: Colors.blue,
+                                        child: new Text('确定'),
+                                        onPressed: () {
+                                          setState(() {
+                                            var items = [];
+                                            if(_selectStart.millisecondsSinceEpoch<_selectEnd.millisecondsSinceEpoch){
+                                              for(int i=0;i<widget.data.length;i++){
+                                                var created = widget.data[i]['created'];
+                                                if(created>_selectStart.millisecondsSinceEpoch&&created<_selectEnd.millisecondsSinceEpoch){
+                                                  items.add(widget.data[i]);
+                                                }
+                                              }
+                                              temp = items;
+                                              searched = true;
+                                            }
+                                          });
+                                          Navigator.of(context).pop(true);
+                                        },
+                                      )
+                                  )
+                              )
+                            ],
+                          );
+                        }
+                    );
+                  },
+                ),
+              ],
+              columns: [DataColumn(label:Text("    由新到旧（仅展示最近50条）"))],
+              source: searched==true?MyNotificationSource(temp):MyNotificationSource(tmp),//MyNotificationSource(items),
+            ),
+            //),
+          );
+        }
+        //return Text("暂无数据");
+}
+

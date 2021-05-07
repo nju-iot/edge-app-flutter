@@ -36,15 +36,13 @@ class _HomeRouteState extends State<HomeRoute>{
     );
   }
 
-
-
   Widget _buildBody(){
-
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children:<Widget>[
 
+        //先写死，实际上应该是有多台edgeX服务器的
         Container(
             width:double.infinity,
             color:Colors.white,
@@ -88,7 +86,7 @@ class _HomeRouteState extends State<HomeRoute>{
             )
         ),
 
-
+        //简单的数据监控，展示一部分数据，先写死
         Container(
           width:double.infinity,
           color:Colors.white,
@@ -162,6 +160,7 @@ class _HomeRouteState extends State<HomeRoute>{
           )
         ),
 
+        //以下为服务菜单
         Padding(
           padding: const EdgeInsets.only(top: 8.0, left: 18, right: 16),
           child: Text(
@@ -288,6 +287,7 @@ class MyDrawer extends StatelessWidget{
 
   }
 
+  //左侧抽屉菜单
   Widget _buildMenus(BuildContext context,AppStatus status){
 
     return ListView(

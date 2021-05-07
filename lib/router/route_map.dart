@@ -8,6 +8,9 @@ import 'package:flutter_app/page/device/profile_info.dart';
 import 'package:flutter_app/page/device/service_info.dart';
 import 'package:flutter_app/page/interval/interval_page.dart';
 import 'package:flutter_app/page/notification/notice_page.dart';
+import 'package:flutter_app/page/notification/notification_info.dart';
+import 'package:flutter_app/page/notification/subscription_add.dart';
+import 'package:flutter_app/page/notification/subscription_info.dart';
 import 'package:flutter_app/page/page_index.dart';
 import 'package:flutter_app/page/rule/rules_page.dart';
 import 'package:flutter_app/page/settings.dart';
@@ -33,6 +36,9 @@ import 'package:flutter_app/routes/user_route.dart';
     AutoRoute(page:DeviceAddPage,path:'/page/device/device_add'),
     AutoRoute(page:ServiceInfoPage,path:'/page/device/service_info/:name'),
     AutoRoute(page:ProfileInfoPage,path:'/page/device/profile_info/:name'),
+    AutoRoute(page:SubInfoPage,path:'/page/notification/sub_info/:id'),
+    AutoRoute(page:NotificationInfoPage,path:'/page/notification/notification_info/:slug'),
+    AutoRoute(page:SubAddPage,path:'/page/notification/subscription_add'),
   ],
     routesClassName: 'Routes',
     transitionsBuilder: getTransitions,

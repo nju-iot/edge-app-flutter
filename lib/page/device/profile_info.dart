@@ -27,6 +27,38 @@ class _ProfileInfoPageState extends State<ProfileInfoPage>{
     return Scaffold(
       appBar:AppBar(
         title:Text("详情"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () async{
+              return await showDialog<bool>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('提示'),
+                      content: Text('是否要删除已读信息？'),
+                      actions: <Widget>[
+                        FlatButton(
+                          child: Text('取消'),
+                          onPressed: () {
+                            Navigator.of(context).pop(false);
+                          },
+                        ),
+                        FlatButton(
+                          child: Text('确认'),
+                          onPressed: () {
+                            MyHttp.delete('/core-metadata/api/v1/deviceprofile/name/${widget.profileName}');
+                            Navigator.of(context).pop(true);
+                            Navigator.of(context).pop(true);
+                          },
+                        ),
+                      ],
+                    );
+                  }
+              );
+            },
+          ),
+        ],
       ),
       body:FutureBuilder(
         future:_future,

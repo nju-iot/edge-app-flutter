@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/router/route_map.gr.dart';
+import 'package:flutter_app/router/router.dart';
 
 import '../../http.dart';
 
+
+List<String> willBeDeleted = [];
 class SubscriptionPage extends StatefulWidget{
 
   @override
@@ -19,10 +23,13 @@ class _SubscriptionPageState extends State<SubscriptionPage>{
         body:ListView(
             children:<Widget>[
               FutureBuilder(
-                future:MyHttp.get('/support-notification/api/v1/subscription'),
+                future:/*MyHttp.get('/support-notification/api/v1/subscription')*/MyHttp.get('/support-notification/api/v1/subscription/labels/metadata').catchError((error){MyHttp.handleError(error);}),
                 builder: (BuildContext context,AsyncSnapshot snapshot){
                   if(snapshot.hasData){
                     tmp = snapshot.data;
+                    for(int i=0;i<tmp.length;i++){
+                      tmp[i]['selected'] = false;
+                    }
                     return Container(
                       //child:Expanded(
                       child:PaginatedDataTable(
@@ -35,12 +42,48 @@ class _SubscriptionPageState extends State<SubscriptionPage>{
                           IconButton(
                               icon: Icon(Icons.refresh),
                               onPressed: (){
-                                setState(() {});
+                                setState(() {
+                                  willBeDeleted = [];
+                                });
                               }
                           ),
                           IconButton(
                             icon:Icon(Icons.add),
-                            onPressed: (){},
+                            onPressed: (){
+                              MyRouter.push(Routes.subAddPage);
+                            },
+                          ),
+                          IconButton(
+                            icon:Icon(Icons.delete),
+                            onPressed:() async{
+                              return await showDialog<bool>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('提示'),
+                                      content: Text('是否要删除选定的消息？'),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          child: Text('取消'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop(true);
+                                          },
+                                        ),
+                                        FlatButton(
+                                          child: Text('确认'),
+                                          onPressed: () {
+                                            for(int i=0;i<willBeDeleted.length;i++){
+                                              MyHttp.delete('/support-notification/api/v1/subscription/${willBeDeleted[i]}');
+                                            }
+                                            willBeDeleted = [];
+                                            Navigator.of(context).pop(true);
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  }
+                              );
+                            },
                           ),
                         ],
                         columns: [DataColumn(label:Text("订阅消息"))],
@@ -93,8 +136,24 @@ class MySubscriptionSource extends DataTableSource{
     if(index>=data.length){
       return null;
     }
+    data.sort((left,right) {
+      int created1 = right['created'];
+      int created2 = left['created'];
+      return created1.compareTo(created2);
+    }
+    );
     return DataRow.byIndex(
         index:index,
+        selected: data[index]['selected'],
+        onSelectChanged: (selected) {
+          data[index]['selected'] = selected;
+          if(selected==true){
+            willBeDeleted.add(data[index]['id']);
+          }else{
+            willBeDeleted.remove(data[index]['id']);
+          }
+          notifyListeners();
+        },
         cells:[
           DataCell(
             ListTile(
@@ -102,7 +161,12 @@ class MySubscriptionSource extends DataTableSource{
               //leading:Text("#${index+1}"),
               title:Text("${data[index]['slug'].toString()}",style:TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text("id: ${data[index]['id'].toString()}"),
-              trailing:Icon(Icons.arrow_forward_ios),
+              trailing:IconButton(
+                icon:Icon(Icons.arrow_forward_ios),
+                onPressed: (){
+                  MyRouter.push(Routes.subInfoPage(id:"${data[index]['id'].toString()}"));
+                },
+              ),
             ),
           ),
         ]
