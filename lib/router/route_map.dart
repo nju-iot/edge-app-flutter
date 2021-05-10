@@ -18,7 +18,7 @@ import 'package:flutter_app/page/theme_color.dart';
 import 'package:flutter_app/routes/cloud_route.dart';
 import 'package:flutter_app/routes/home_route.dart';
 import 'package:flutter_app/routes/user_route.dart';
-
+import 'package:flutter_app/page/interval/interval_add.dart';
 //页面路由映射表,在这里注册页面路由
 @CustomAutoRouter(
   routes:<AutoRoute>[
@@ -39,6 +39,7 @@ import 'package:flutter_app/routes/user_route.dart';
     AutoRoute(page:SubInfoPage,path:'/page/notification/sub_info/:id'),
     AutoRoute(page:NotificationInfoPage,path:'/page/notification/notification_info/:slug'),
     AutoRoute(page:SubAddPage,path:'/page/notification/subscription_add'),
+    AutoRoute(page: IntervalAddPage,path: '/page/interval/interval_add'),
   ],
     routesClassName: 'Routes',
     transitionsBuilder: getTransitions,

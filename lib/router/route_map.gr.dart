@@ -14,6 +14,7 @@ import '../page/device/device_info.dart';
 import '../page/device/device_page.dart';
 import '../page/device/profile_info.dart';
 import '../page/device/service_info.dart';
+import '../page/interval/interval_add.dart';
 import '../page/interval/interval_page.dart';
 import '../page/notification/notice_page.dart';
 import '../page/notification/notification_info.dart';
@@ -57,6 +58,7 @@ class Routes {
   static String notificationInfoPage({@required dynamic slug}) =>
       '/page/notification/notification_info/$slug';
   static const String subAddPage = '/page/notification/subscription_add';
+  static const String intervalAddPage = '/page/interval/interval_add';
   static const all = <String>{
     indexPage,
     homeRoute,
@@ -75,6 +77,7 @@ class Routes {
     _subInfoPage,
     _notificationInfoPage,
     subAddPage,
+    intervalAddPage,
   };
 }
 
@@ -99,6 +102,7 @@ class RouterMap extends RouterBase {
     RouteDef(Routes._subInfoPage, page: SubInfoPage),
     RouteDef(Routes._notificationInfoPage, page: NotificationInfoPage),
     RouteDef(Routes.subAddPage, page: SubAddPage),
+    RouteDef(Routes.intervalAddPage, page: IntervalAddPage),
   ];
   @override
   Map<Type, AutoRouteFactory> get pagesMap => _pagesMap;
@@ -257,6 +261,17 @@ class RouterMap extends RouterBase {
     SubAddPage: (data) {
       return PageRouteBuilder<dynamic>(
         pageBuilder: (context, animation, secondaryAnimation) => SubAddPage(),
+        settings: data,
+        opaque: false,
+        barrierDismissible: false,
+        transitionsBuilder: getTransitions,
+        transitionDuration: const Duration(milliseconds: 800),
+      );
+    },
+    IntervalAddPage: (data) {
+      return PageRouteBuilder<dynamic>(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            IntervalAddPage(),
         settings: data,
         opaque: false,
         barrierDismissible: false,
