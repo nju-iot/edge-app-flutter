@@ -119,8 +119,33 @@ class _SubAddPageState extends State<SubAddPage>{
 
                       Text("订阅标签",style:TextStyle(color:Colors.black,fontSize: 14)),
                       MyAddLabel(postTmp, subLabels),
-                    ]
-                  )
+                    ],
+                  ),
+                  onWillPop: () async{
+                    return await showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('提示'),
+                            content: Text('是否要取消添加订阅并退出？'),
+                            actions: <Widget>[
+                              FlatButton(
+                                child: Text('取消'),
+                                onPressed: () {
+                                  Navigator.of(context).pop(false);
+                                },
+                              ),
+                              FlatButton(
+                                child: Text('确认'),
+                                onPressed: () {
+                                  Navigator.of(context).pop(true);
+                                },
+                              ),
+                            ],
+                          );
+                        }
+                    );
+                  },
                 )
               )
             ]

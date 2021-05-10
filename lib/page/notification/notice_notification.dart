@@ -153,200 +153,204 @@ class _NoticeListState extends State<NoticeListBaseWidget>{
   DateTime _selectStart = DateTime.now();
   DateTime _selectEnd = DateTime.now();
 
+  //时间选择器
+  _showStartPicker(Function state) {
+    showDatePicker(
+      context: context,
+      initialDate: _selectStart, //选中的日期
+      firstDate: DateTime(1970), //日期选择器上可选择的最早日期
+      lastDate: DateTime(2030), //日期选择器上可选择的最晚日期
+    ).then((selectedValue) {
+      state(() {
+        if(selectedValue!=null) {
+          _selectStart = selectedValue;
+        }
+      });
+    });
+  }
+
+  _showEndPicker(Function state) {
+    showDatePicker(
+      context: context,
+      initialDate: _selectEnd, //选中的日期
+      firstDate: DateTime(1970), //日期选择器上可选择的最早日期
+      lastDate: DateTime(2030), //日期选择器上可选择的最晚日期
+    ).then((selectedValue) {
+      state(() {
+        if(selectedValue!=null){
+          _selectEnd = selectedValue;
+        }
+      });
+    });
+  }
+
+  //筛选弹窗
+  Widget timepicker(Function state){
+    return SimpleDialog(
+      title:Text('按时间筛选'),
+      children: <Widget>[
+        SimpleDialogOption(
+          child: InkWell(
+            onTap:(){
+              _showStartPicker(state);
+            },
+            child:Text.rich(TextSpan(
+                children:[
+                  TextSpan(
+                    text:"起始: ",
+                    style:TextStyle(
+                      color:Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize:14,
+                    ),
+                  ),
+                  TextSpan(
+                    text:formatDate(_selectStart, [yyyy, "-", mm, "-", "dd"]),
+                    style:TextStyle(
+                      color:Colors.blue,
+                      fontSize:14,
+                    ),
+                  )
+                ]
+            )),
+          ),
+        ),
+        SimpleDialogOption(
+          child: InkWell(
+            onTap:(){
+              _showEndPicker(state);
+            },
+            child:Text.rich(TextSpan(
+                children:[
+                  TextSpan(
+                    text:"截至: ",
+                    style:TextStyle(
+                      color:Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize:14,
+                    ),
+                  ),
+                  TextSpan(
+                    text:formatDate(_selectEnd, [yyyy, "-", mm, "-", "dd"]),
+                    style:TextStyle(
+                      color:Colors.blue,
+                      fontSize:14,
+                    ),
+                  )
+                ]
+            )),
+          ),
+        ),
+        Container(
+            width:60.0,
+            child:SizedBox(
+                width:60.0,
+                child:FlatButton(
+                  //color: Colors.blue,
+                  textColor: Colors.blue,
+                  child: new Text('确定'),
+                  onPressed: () {
+                    setState(() {
+                      var items = [];
+                      if(_selectStart.millisecondsSinceEpoch<_selectEnd.millisecondsSinceEpoch){
+                        for(int i=0;i<widget.data.length;i++){
+                          var created = widget.data[i]['created'];
+                          if(created>_selectStart.millisecondsSinceEpoch&&created<_selectEnd.millisecondsSinceEpoch){
+                            items.add(widget.data[i]);
+                          }
+                        }
+                        temp = items;
+                        searched = true;
+                      }
+                    });
+                    Navigator.of(context).pop(true);
+                  },
+                )
+            )
+        )
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    _showStartPicker() {
-      showDatePicker(
-        context: context,
-        initialDate: _selectStart, //选中的日期
-        firstDate: DateTime(1970), //日期选择器上可选择的最早日期
-        lastDate: DateTime(2030), //日期选择器上可选择的最晚日期
-      ).then((selectedValue) {
-        setState(() {
-          if(selectedValue!=null) {
-            _selectStart = selectedValue;
-          }
-        });
-      });
-    }
-
-    _showEndPicker() {
-      showDatePicker(
-        context: context,
-        initialDate: _selectEnd, //选中的日期
-        firstDate: DateTime(1970), //日期选择器上可选择的最早日期
-        lastDate: DateTime(2030), //日期选择器上可选择的最晚日期
-      ).then((selectedValue) {
-        setState(() {
-          if(selectedValue!=null){
-            _selectEnd = selectedValue;
-          }
-        });
-      });
-    }
-
-          return Container(
-            //child:Expanded(
-            child:PaginatedDataTable(
-              rowsPerPage: searched==true?(temp.length==0?1:temp.length<=6?temp.length:6):(tmp.length<=6?tmp.length:6),
-              header: Text("提醒消息"),
-              headingRowHeight: 24.0,
-              horizontalMargin: 8.0,
-              dataRowHeight: 60.0,
-              actions:<Widget>[
-                IconButton(
-                    icon: Icon(Icons.refresh),
-                    onPressed: (){
-                      setState(() {
-                        searched = false;
-                        _selectStart = DateTime.now();
-                        _selectEnd = DateTime.now();
-                        willBeDeleted = [];
-                      });
-                    }
-                ),
-                IconButton(
-                  icon:Icon(Icons.delete),
-                  onPressed:() async{
-                    return await showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('提示'),
-                            content: Text('是否要删除选定的消息？'),
-                            actions: <Widget>[
-                              FlatButton(
-                                child: Text('取消'),
-                                onPressed: () {
-                                  Navigator.of(context).pop(true);
-                                },
-                              ),
-                              FlatButton(
-                                child: Text('确认'),
-                                onPressed: () {
-                                  for(int i=0;i<willBeDeleted.length;i++){
-                                    MyHttp.delete('/support-notification/api/v1/notification/slug/${willBeDeleted[i]}');
-                                  }
-                                  willBeDeleted = [];
-                                  Navigator.of(context).pop(true);
-                                },
-                              ),
-                            ],
+    
+    return Container(
+      //child:Expanded(
+      child:PaginatedDataTable(
+        rowsPerPage: searched==true?(temp.length==0?1:temp.length<=6?temp.length:6):(tmp.length<=6?tmp.length:6),
+        header: Text("提醒消息"),
+        headingRowHeight: 24.0,
+        horizontalMargin: 8.0,
+        dataRowHeight: 60.0,
+        actions:<Widget>[
+          IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: (){
+                setState(() {
+                  searched = false;
+                  _selectStart = DateTime.now();
+                  _selectEnd = DateTime.now();
+                  willBeDeleted = [];
+                });
+              }
+          ),
+          IconButton(
+            icon:Icon(Icons.delete),
+            onPressed:() async{
+              return await showDialog<bool>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('提示'),
+                      content: Text('是否要删除选定的消息？'),
+                      actions: <Widget>[
+                        FlatButton(
+                          child: Text('取消'),
+                          onPressed: () {
+                            Navigator.of(context).pop(true);
+                          },
+                        ),
+                        FlatButton(
+                          child: Text('确认'),
+                          onPressed: () {
+                            for(int i=0;i<willBeDeleted.length;i++){
+                              MyHttp.delete('/support-notification/api/v1/notification/slug/${willBeDeleted[i]}');
+                            }
+                            willBeDeleted = [];
+                            Navigator.of(context).pop(true);
+                          },
+                        ),
+                      ],
+                    );
+                  }
+              );
+            },
+          ),
+          IconButton(
+            icon:Icon(Icons.search),
+            onPressed: () {
+              return showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return StatefulBuilder(
+                        builder: (context,state){
+                          //return timepicker(state);
+                          return Container(
+                            child:timepicker(state),
                           );
                         }
                     );
-                  },
-                ),
-                IconButton(
-                  icon:Icon(Icons.search),
-                  onPressed: () {
-                    return showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return SimpleDialog(
-                            title:Text('按时间筛选'),
-                            children: <Widget>[
-                              SimpleDialogOption(
-                                child: InkWell(
-                                  onTap:(){
-                                    _showStartPicker();
-                                  },
-                                  child:Text.rich(TextSpan(
-                                      children:[
-                                        TextSpan(
-                                          text:"起始: ",
-                                          style:TextStyle(
-                                            color:Colors.black,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize:14,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text:formatDate(_selectStart, [yyyy, "-", mm, "-", "dd"]),
-                                          style:TextStyle(
-                                            color:Colors.blue,
-                                            fontSize:14,
-                                          ),
-                                        )
-                                      ]
-                                  )),
-                                ),
-                                /*onPressed: () {
-                                  _showStartPicker();
-                                  //print(_selectStart.millisecondsSinceEpoch);
-                                },*/
-                              ),
-                              SimpleDialogOption(
-                                child: InkWell(
-                                  onTap:(){
-                                    _showEndPicker();
-                                  },
-                                  child:Text.rich(TextSpan(
-                                      children:[
-                                        TextSpan(
-                                          text:"截至: ",
-                                          style:TextStyle(
-                                            color:Colors.black,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize:14,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text:formatDate(_selectEnd, [yyyy, "-", mm, "-", "dd"]),
-                                          style:TextStyle(
-                                            color:Colors.blue,
-                                            fontSize:14,
-                                          ),
-                                        )
-                                      ]
-                                  )),
-                                ),
-                                /*onPressed: () {
-                                  _showEndPicker();
-                                  //print(_selectEnd.millisecondsSinceEpoch);
-                                },*/
-                              ),
-                              Container(
-                                  width:60.0,
-                                  child:SizedBox(
-                                      width:60.0,
-                                      child:FlatButton(
-                                        //color: Colors.blue,
-                                        textColor: Colors.blue,
-                                        child: new Text('确定'),
-                                        onPressed: () {
-                                          setState(() {
-                                            var items = [];
-                                            if(_selectStart.millisecondsSinceEpoch<_selectEnd.millisecondsSinceEpoch){
-                                              for(int i=0;i<widget.data.length;i++){
-                                                var created = widget.data[i]['created'];
-                                                if(created>_selectStart.millisecondsSinceEpoch&&created<_selectEnd.millisecondsSinceEpoch){
-                                                  items.add(widget.data[i]);
-                                                }
-                                              }
-                                              temp = items;
-                                              searched = true;
-                                            }
-                                          });
-                                          Navigator.of(context).pop(true);
-                                        },
-                                      )
-                                  )
-                              )
-                            ],
-                          );
-                        }
-                    );
-                  },
-                ),
-              ],
-              columns: [DataColumn(label:Text("    由新到旧（仅展示最近50条）"))],
-              source: searched==true?MyNotificationSource(temp):MyNotificationSource(tmp),//MyNotificationSource(items),
-            ),
-            //),
-          );
-        }
-        //return Text("暂无数据");
+                  }
+              );
+            },
+          ),
+        ],
+        columns: [DataColumn(label:Text("    由新到旧（仅展示最近50条）"))],
+        source: searched==true?MyNotificationSource(temp):MyNotificationSource(tmp),//MyNotificationSource(items),
+      ),
+      //),
+    );
+  }
 }
 
