@@ -16,7 +16,7 @@ class Store {
       providers: [
         ChangeNotifierProvider(create: (_) => AppTheme(getDefaultTheme())),
         ChangeNotifierProvider.value(value: AppStatus(TAB_HOME_EDGE_INDEX)),
-        //ChangeNotifierProvider.value(value: ProtocolStatus('mqtt')),
+        ChangeNotifierProvider.value(value: UserProfile(SPUtils.getUserName())),
       ],
       child: child,
     );
@@ -98,19 +98,17 @@ class AppStatus with ChangeNotifier{
   }
 }
 
-/*class ProtocolStatus with ChangeNotifier{
-  String _value;
-  ProtocolStatus(this._value);
+///用户信息
+class UserProfile with ChangeNotifier {
+  String _userName;
 
-  String get value => _value;
+  UserProfile(this._userName);
 
-  set value(String newValue){
-    _value = newValue;
-    //notifyListeners();
-    Future.delayed(Duration(milliseconds: 200)).then((e){
-      notifyListeners();
-    });
+  String get userName => _userName;
+
+  set userName(String userName) {
+    _userName = userName;
+    SPUtils.saveUserName(userName);
+    notifyListeners();
   }
-
-
-}*/
+}

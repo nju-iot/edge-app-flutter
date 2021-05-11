@@ -10,6 +10,7 @@ import 'package:flutter_app/utils/provider.dart';
 import 'package:flutter_app/widget/grid_item.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeRoute extends StatefulWidget{
   @override
@@ -221,9 +222,7 @@ class _HomeRouteState extends State<HomeRoute>{
     FunctionPageItem("规则引擎", Colors.grey[200], Icon(Icons.rule,size:36), Routes.rulesPage),
   ];
 
-
 }
-
 
 ///主界面的drawer
 class MyDrawer extends StatelessWidget{
@@ -231,12 +230,10 @@ class MyDrawer extends StatelessWidget{
     Key key,
 }):super(key:key);
 
-
-
   @override
   Widget build(BuildContext context){
-    return Consumer<AppStatus>(
-      builder:(BuildContext context, AppStatus status,Widget child){
+    return Consumer2<UserProfile,AppStatus>(
+      builder:(BuildContext context, UserProfile profile,AppStatus status,Widget child){
         return Drawer(
           child:SingleChildScrollView(
             child:MediaQuery.removePadding(
@@ -245,7 +242,7 @@ class MyDrawer extends StatelessWidget{
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children:<Widget>[
-                  _buildHeader(context),
+                  _buildHeader(context,profile),
                   _buildMenus(context,status),
                   //Expanded(child:_buildMenus(context,status)),
                 ],
@@ -257,7 +254,7 @@ class MyDrawer extends StatelessWidget{
     );
   }
 
-  Widget _buildHeader(BuildContext context){
+  Widget _buildHeader(BuildContext context,UserProfile profile){
       return GestureDetector(
         child:Container(
           color: Theme.of(context).primaryColor,
@@ -274,7 +271,8 @@ class MyDrawer extends StatelessWidget{
                 ),
               ),
               Text(
-                "登录（假的）",
+                profile.userName!=null?profile.userName:"用户(假的)",
+                overflow: TextOverflow.ellipsis,
                 style:TextStyle(
                   fontWeight: FontWeight.bold,
                   color:Colors.white,
@@ -334,8 +332,10 @@ class MyDrawer extends StatelessWidget{
         Divider(height: 1.0, color: Colors.grey),
         ListTile(
           leading: const Icon(Icons.logout),
-          title:Text("登出(假的)"),
-          onTap:() {},
+          title:Text("登出"),
+          onTap:() {
+            MyRouter.replace(Routes.loginPage);
+          },
         )
       ],
     );

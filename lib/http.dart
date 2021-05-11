@@ -14,14 +14,12 @@ class MyHttp{
     )
   );
 
-  ///初始化dio
+  //初始化dio
   static init(){
-
-
 
   }
 
-  ///error统一处理
+  //error统一处理
   static void handleError(DioError e) {
     switch (e.type) {
       case DioErrorType.CONNECT_TIMEOUT:
@@ -80,6 +78,5 @@ class MyHttp{
     Response response = await dio.delete(url);
     return response.data;
   }
-
 
 }

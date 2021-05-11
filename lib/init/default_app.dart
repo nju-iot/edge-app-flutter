@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/http.dart';
 import 'package:flutter_app/page/page_index.dart';
+import 'package:flutter_app/router/route_map.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
 import 'package:flutter_app/routes/home_route.dart';
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget{
           //home: IndexPage(),
           builder: ExtendedNavigator<RouterMap>(
             router:RouterMap(),//路由注册,配置见router目录
+            guards: [AuthGuard()],
           ),
         );
       },

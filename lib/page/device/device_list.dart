@@ -17,21 +17,21 @@ class DeviceListPage extends StatefulWidget{
 
 class DeviceListPageState extends State<DeviceListPage>{
 
-
   @override
   void initState(){
     super.initState();
     setState(() {
     });
   }
-  var items = [];//展示结果
+
+  var items = [];//展示搜索结果
   List<dynamic> showTmp = [];//从服务器上请求到的数据，用户可能会对其进行筛选，这是实际上要展示的数据。
   bool searched = false;//标记是否进行筛选操作
 
   @override
   Widget build(BuildContext context){
 
-    //final GlobalKey<ScaffoldState> _ScaffoldKey = GlobalKey();
+    final GlobalKey<ScaffoldState> _ScaffoldKey = GlobalKey();
     //_ScaffoldKey.currentState.openEndDrawer();
     Future<Null> _onrefresh(){
       return Future.delayed(Duration(seconds: 5),(){   // 延迟5s完成刷新
