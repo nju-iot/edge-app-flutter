@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
+import 'package:flutter_app/http.dart';
 
 class IntervalListPage extends StatefulWidget{
   @override
@@ -40,13 +41,44 @@ class IntervalListPageState extends State<IntervalListPage>{
             ListTile(title: Text("title"),trailing: IconButton(icon: Icon(Icons.add),onPressed: (){
               MyRouter.push(Routes.intervalAddPage);
             },),),
-            Expanded(
-              child: ListView.builder(
-                itemBuilder:(BuildContext context,int index){
-                  return ListTile(title: Text("${index+1}"),
-                  trailing: IconButton(icon: Icon(Icons.arrow_forward_ios), onPressed: null)
-                  );
-                } ))
+            FutureBuilder(
+                future: MyHttp.get('/support-scheduler/api/v1/interval'),
+                builder: (BuildContext context,AsyncSnapshot snapshot){
+                  if(snapshot.connectionState==ConnectionState.done){
+                    if(snapshot.hasError){
+                      return Text("Error: ${snapshot.error}");
+                    }else{
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Material(
+                          color: Colors.white,
+                          elevation: 4.0,
+                          child: Container(
+                            child:ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: snapshot.data.length,
+                              itemBuilder: (BuildContext context,int index){
+                                return ListTile(
+                                  onTap: (){},
+                                  title: Text("${snapshot.data[index]['name'].toString()}"),
+                                  trailing: IconButton(
+                                    icon: Icon(Icons.arrow_forward_ios),
+                                    onPressed: (){
+                                      //TODO: 跳转到定时任务修改页面
+                                    },),
+                                );
+                              },
+                              )
+                            ),
+                          ),
+                      );
+                    }
+                  }else{
+                    return CircularProgressIndicator();
+                  }
+                },
+                )
+                
           ],
         ),
       ), 
