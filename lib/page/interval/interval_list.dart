@@ -38,7 +38,7 @@ class IntervalListPageState extends State<IntervalListPage>{
       child: Scaffold(
         body: Column(
           children: <Widget>[
-            ListTile(title: Text("title"),trailing: IconButton(icon: Icon(Icons.add),onPressed: (){
+            ListTile(title: Text("定时任务"),trailing: IconButton(icon: Icon(Icons.add),onPressed: (){
               MyRouter.push(Routes.intervalAddPage);
             },),),
             FutureBuilder(
@@ -51,21 +51,26 @@ class IntervalListPageState extends State<IntervalListPage>{
                       return ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Material(
-                          color: Colors.white,
+                          //color: Colors.white,
                           elevation: 4.0,
                           child: Container(
                             child:ListView.builder(
                               shrinkWrap: true,
                               itemCount: snapshot.data.length,
                               itemBuilder: (BuildContext context,int index){
-                                return ListTile(
-                                  onTap: (){},
-                                  title: Text("${snapshot.data[index]['name'].toString()}"),
-                                  trailing: IconButton(
-                                    icon: Icon(Icons.arrow_forward_ios),
-                                    onPressed: (){
-                                      //TODO: 跳转到定时任务修改页面
-                                    },),
+                                return Card(
+                                  child: ListTile(
+                                    leading: Text("${index+1}"),
+                                    onTap: (){},
+                                    title: Text("${snapshot.data[index]['name'].toString()}",
+                                    style: TextStyle(fontWeight: FontWeight.bold),),
+                                    subtitle: Text("id: ${snapshot.data[index]['id'].toString()}"),
+                                    trailing: IconButton(
+                                      icon: Icon(Icons.arrow_forward_ios),
+                                      onPressed: (){
+                                        //TODO: 跳转到定时任务修改页面
+                                      },),
+                                  ),
                                 );
                               },
                               )
