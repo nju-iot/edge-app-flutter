@@ -41,48 +41,50 @@ class IntervalListPageState extends State<IntervalListPage>{
             ListTile(title: Text("定时任务"),trailing: IconButton(icon: Icon(Icons.add),onPressed: (){
               MyRouter.push(Routes.intervalAddPage);
             },),),
-            FutureBuilder(
+            Expanded(
+              child: FutureBuilder(
                 future: MyHttp.get('/support-scheduler/api/v1/interval'),
                 builder: (BuildContext context,AsyncSnapshot snapshot){
                   if(snapshot.connectionState==ConnectionState.done){
-                    if(snapshot.hasError){
-                      return Text("Error: ${snapshot.error}");
-                    }else{
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Material(
-                          //color: Colors.white,
-                          elevation: 4.0,
-                          child: Container(
-                            child:ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: snapshot.data.length,
-                              itemBuilder: (BuildContext context,int index){
-                                return Card(
-                                  child: ListTile(
-                                    leading: Text("${index+1}"),
-                                    onTap: (){},
-                                    title: Text("${snapshot.data[index]['name'].toString()}",
-                                    style: TextStyle(fontWeight: FontWeight.bold),),
-                                    subtitle: Text("id: ${snapshot.data[index]['id'].toString()}"),
-                                    trailing: IconButton(
-                                      icon: Icon(Icons.arrow_forward_ios),
-                                      onPressed: (){
-                                        //TODO: 跳转到定时任务修改页面
-                                      },),
-                                  ),
-                                );
-                              },
-                              )
+                      if(snapshot.hasError){
+                        return Text("Error: ${snapshot.error}");
+                      }else{
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Material(
+                            //color: Colors.white,
+                            elevation: 4.0,
+                            child: Container(
+                              child:ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: snapshot.data.length,
+                                itemBuilder: (BuildContext context,int index){
+                                  return Card(
+                                    child: ListTile(
+                                      leading: Text("${index+1}"),
+                                      onTap: (){},
+                                      title: Text("${snapshot.data[index]['name'].toString()}",
+                                      style: TextStyle(fontWeight: FontWeight.bold),),
+                                      subtitle: Text("id: ${snapshot.data[index]['id'].toString()}"),
+                                      trailing: IconButton(
+                                        icon: Icon(Icons.arrow_forward_ios),
+                                        onPressed: (){
+                                          //TODO: 跳转到定时任务修改页面
+                                        },),
+                                    ),
+                                  );
+                                },
+                                )
+                              ),
                             ),
-                          ),
-                      );
+                        );
+                      }
+                    }else{
+                      return CircularProgressIndicator();
                     }
-                  }else{
-                    return CircularProgressIndicator();
-                  }
-                },
-                )
+                  },
+                  ),
+            )
                 
           ],
         ),
