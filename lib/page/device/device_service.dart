@@ -25,7 +25,7 @@ class _DeviceServicePageState extends State<DeviceServicePage>{
                     return Container(
                       child:PaginatedDataTable(
                         rowsPerPage: tmp.length<=6?tmp.length:6,
-                        header: Text("DeviceService"),
+                        header: Text("设备服务"),
                         headingRowHeight: 24.0,
                         horizontalMargin: 8.0,
                         dataRowHeight: 60.0,
@@ -59,7 +59,7 @@ class _DeviceServicePageState extends State<DeviceServicePage>{
                             },
                           ),
                         ],
-                        columns: [DataColumn(label:Text("设备服务信息"))],
+                        columns: [DataColumn(label:Text("基本信息"))],
                         source: MyServiceSource(tmp),
                       ),
                     );
@@ -79,7 +79,7 @@ class _DeviceServicePageState extends State<DeviceServicePage>{
                                 }
                             ),
                           ],
-                          columns: [DataColumn(label:Text("设备服务信息"))],
+                          columns: [DataColumn(label:Text("基本信息"))],
                           source: MyServiceSource(tmp),
                         ),
                     );
@@ -114,7 +114,7 @@ class MyServiceSource extends DataTableSource{
               onTap:(){},
               //leading:Text("#${index+1}"),
               title:Text("${data[index]['name'].toString()}",style:TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text("id: ${data[index]['id'].toString()}"),
+              subtitle: Text("id: ${data[index]['id'].toString()}",maxLines: 2,overflow: TextOverflow.ellipsis),
               trailing:IconButton(
                   icon:Icon(Icons.arrow_forward_ios),
                   onPressed: (){

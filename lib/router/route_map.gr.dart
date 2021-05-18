@@ -122,7 +122,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     HomeRoute: (data) {
@@ -132,7 +132,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     CloudRoute: (data) {
@@ -142,7 +142,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     UserRoute: (data) {
@@ -152,7 +152,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     LoginPage: (data) {
@@ -162,7 +162,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     RegisterPage: (data) {
@@ -172,7 +172,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     SettingPage: (data) {
@@ -189,7 +189,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     DevicePage: (data) {
@@ -224,7 +224,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     DeviceAddPage: (data) {
@@ -235,7 +235,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     ServiceInfoPage: (data) {
@@ -246,7 +246,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     ProfileInfoPage: (data) {
@@ -257,7 +257,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     SubInfoPage: (data) {
@@ -268,7 +268,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     NotificationInfoPage: (data) {
@@ -279,7 +279,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     SubAddPage: (data) {
@@ -289,7 +289,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
   };

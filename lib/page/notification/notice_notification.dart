@@ -43,7 +43,7 @@ class _NotificationPageState extends State<NotificationPage>{
                       //child:Expanded(
                       child:PaginatedDataTable(
                         rowsPerPage: 1,
-                        header: Text("提醒消息"),
+                        header: Text("通知消息"),
                         headingRowHeight: 24.0,
                         horizontalMargin: 8.0,
                         dataRowHeight: 60.0,
@@ -101,18 +101,21 @@ class MyNotificationSource extends DataTableSource{
         },
         cells:[
           DataCell(
-            ListTile(
-              onTap:(){},
-              //leading:Text("#${index+1}"),
-              title:Text("${data[index]['slug'].toString()}",style:TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text("id: ${data[index]['id'].toString()}"),
-              trailing:IconButton(
-                icon:Icon(Icons.arrow_forward_ios),
-                onPressed: (){
-                  MyRouter.push(Routes.notificationInfoPage(slug: "${data[index]['slug'].toString()}"));
-                },
+            SizedBox(
+              width:336.0,
+              child:ListTile(
+                onTap:(){},
+                //leading:Text("#${index+1}"),
+                title:Text("${data[index]['slug'].toString()}",style:TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text("id: ${data[index]['id'].toString()}",maxLines: 2,overflow: TextOverflow.ellipsis,),
+                trailing:IconButton(
+                  icon:Icon(Icons.arrow_forward_ios),
+                  onPressed: (){
+                    MyRouter.push(Routes.notificationInfoPage(slug: "${data[index]['slug'].toString()}"));
+                  },
+                ),
               ),
-            ),
+            )
           ),
         ]
     );
@@ -279,7 +282,7 @@ class _NoticeListState extends State<NoticeListBaseWidget>{
       //child:Expanded(
       child:PaginatedDataTable(
         rowsPerPage: searched==true?(temp.length==0?1:temp.length<=6?temp.length:6):(tmp.length<=6?tmp.length:6),
-        header: Text("提醒消息"),
+        header: Text("通知消息"),
         headingRowHeight: 24.0,
         horizontalMargin: 8.0,
         dataRowHeight: 60.0,

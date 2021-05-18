@@ -29,11 +29,26 @@ class _DevicePageState extends State<DevicePage> with SingleTickerProviderStateM
 
   }
 
+  List<Widget> getTabWidget(BuildContext context) =>[
+    DevicePage(),
+    DeviceServicePage(),
+    DeviceProfilePage(),
+  ];
+
   @override
   Widget build(BuildContext context){
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
     return Scaffold(
       appBar: AppBar(
         title:Text("设备管理"),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              appBarColor[800],
+              appBarColor[200],
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          ),
+        ),
         bottom:TabBar(
           controller:_tabController,
           indicatorColor: Colors.white,
@@ -47,7 +62,7 @@ class _DevicePageState extends State<DevicePage> with SingleTickerProviderStateM
       body:TabBarView(
         controller:_tabController,
         children:<Widget>[
-          DeviceListPage(),
+           DeviceListPage(),
           DeviceServicePage(),
           DeviceProfilePage(),
         ],

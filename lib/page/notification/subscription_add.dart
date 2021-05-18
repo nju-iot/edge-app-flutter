@@ -16,6 +16,7 @@ class SubAddPage extends StatefulWidget{
 class _SubAddPageState extends State<SubAddPage>{
   @override
   Widget build(BuildContext context) {
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
     GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     postTmp = {
@@ -62,6 +63,14 @@ class _SubAddPageState extends State<SubAddPage>{
     return Scaffold(
       appBar:AppBar(
         title:Text("新增"),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              appBarColor[800],
+              appBarColor[200],
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          ),
+        ),
       ),
       floatingActionButton: new FloatingActionButton(
         onPressed: _forSubmitted,
@@ -114,6 +123,7 @@ class _SubAddPageState extends State<SubAddPage>{
                           postTmp['description'] = val;
                         },
                       ),
+                      SizedBox(height:30),
                       Text("订阅类别",style:TextStyle(color:Colors.black,fontSize: 14)),
                       MyCata(postTmp),
 

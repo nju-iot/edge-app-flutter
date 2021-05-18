@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route_annotations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/widget/icon_with_text.dart';
 
 import '../../http.dart';
 
@@ -24,9 +25,18 @@ class _ProfileInfoPageState extends State<ProfileInfoPage>{
 
   @override
   Widget build(BuildContext context) {
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
     return Scaffold(
       appBar:AppBar(
         title:Text("详情"),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              appBarColor[800],
+              appBarColor[200],
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.delete),
@@ -65,6 +75,7 @@ class _ProfileInfoPageState extends State<ProfileInfoPage>{
         builder:(BuildContext context,AsyncSnapshot snapshot){
             if(snapshot.hasData){
               profileInfo = snapshot.data;
+              print(profileInfo);
               String createdTime = DateTime.fromMillisecondsSinceEpoch(profileInfo['created']).toString();
               return ListView(
                 children:<Widget>[
@@ -77,25 +88,29 @@ class _ProfileInfoPageState extends State<ProfileInfoPage>{
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children:<Widget>[
                             Text("基本信息",style:TextStyle(color:Colors.green,fontWeight: FontWeight.bold,fontSize: 16)),
-                            Text.rich(TextSpan(
-                                children:[
-                                  TextSpan(
-                                    text:"名称: ",
-                                    style:TextStyle(
-                                      color:Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize:14,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text:profileInfo['name'],
-                                    style:TextStyle(
-                                      color:Colors.grey,
-                                      fontSize:14,
-                                    ),
-                                  )
-                                ]
-                            )),
+                            Row(
+                              children:<Widget>[
+                                Text.rich(TextSpan(
+                                    children:[
+                                      TextSpan(
+                                        text:"名称: ",
+                                        style:TextStyle(
+                                          color:Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize:14,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text:profileInfo['name'],
+                                        style:TextStyle(
+                                          color:Colors.grey,
+                                          fontSize:14,
+                                        ),
+                                      )
+                                    ]
+                                )),
+                              ]
+                            ),
                             Text.rich(TextSpan(
                                 children:[
                                   TextSpan(
@@ -145,7 +160,7 @@ class _ProfileInfoPageState extends State<ProfileInfoPage>{
                                     ),
                                   ),
                                   TextSpan(
-                                    text:profileInfo['label'].toString().substring(1,profileInfo['label'].toString().length-1),
+                                    text:profileInfo['labels'].toString().substring(1,profileInfo['labels'].toString().length-1),
                                     style:TextStyle(
                                       color:Colors.grey,
                                       fontSize:14,

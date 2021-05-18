@@ -11,7 +11,7 @@ import 'package:flutter_app/utils/provider.dart';
 import 'package:provider/provider.dart';
 
 
-//默认APP的启动
+//默认APP的启动类
 class DefaultApp{
   static void run(){
     WidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget{
           //home: IndexPage(),
           builder: ExtendedNavigator<RouterMap>(
             router:RouterMap(),//路由注册,配置见router目录
-            guards: [AuthGuard()],
+            guards: [AuthGuard()],//登陆状态检查中间件
           ),
         );
       },

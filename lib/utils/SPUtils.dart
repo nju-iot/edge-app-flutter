@@ -1,9 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 //主题颜色、登陆状态管理
 class SPUtils {
-  /// 内部构造方法，可避免外部暴露构造函数，进行实例化
+  // 内部构造方法，可避免外部暴露构造函数，进行实例化
   SPUtils._internal();
 
   static SharedPreferences _spf;
@@ -15,7 +14,7 @@ class SPUtils {
     return _spf;
   }
 
-  ///主题
+  //主题
   static Future<bool> saveThemeIndex(int value) {
     return _spf.setInt('key_theme_color', value);
   }

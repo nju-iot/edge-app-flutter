@@ -24,9 +24,18 @@ class _NotificationInfoPageState extends State<NotificationInfoPage>{
 
   @override
   Widget build(BuildContext context) {
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
     return Scaffold(
       appBar:AppBar(
-        title:Text("提醒消息"),
+        title:Text("通知消息"),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              appBarColor[800],
+              appBarColor[200],
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.delete),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/http.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
+import 'package:flutter_app/widget/icon_with_text.dart';
 
 class ServiceInfoPage extends StatefulWidget{
   final String serviceName;
@@ -28,9 +29,18 @@ class _ServiceInfoPageState extends State<ServiceInfoPage>{
 
   @override
   Widget build(BuildContext context) {
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
     return Scaffold(
       appBar:AppBar(
         title:Text("详情"),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              appBarColor[800],
+              appBarColor[200],
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          ),
+        ),
       ),
       body:FutureBuilder(
         future:_future,
@@ -48,7 +58,7 @@ class _ServiceInfoPageState extends State<ServiceInfoPage>{
                         child:Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children:<Widget>[
-                              Text("基本信息",style:TextStyle(color:Colors.green,fontWeight: FontWeight.bold,fontSize: 16)),
+                              IconText(" 基本信息",icon:Icon(Icons.info),style:TextStyle(color:Colors.green,fontWeight: FontWeight.bold,fontSize: 16)),
                               Text.rich(TextSpan(
                                 children:[
                                   TextSpan(
@@ -90,7 +100,7 @@ class _ServiceInfoPageState extends State<ServiceInfoPage>{
                               Text.rich(TextSpan(
                                   children:[
                                     TextSpan(
-                                      text:"管理状态: ",
+                                      text:"是否锁定: ",
                                       style:TextStyle(
                                         color:Colors.black,
                                         fontWeight: FontWeight.bold,
@@ -109,7 +119,7 @@ class _ServiceInfoPageState extends State<ServiceInfoPage>{
                               Text.rich(TextSpan(
                                   children:[
                                     TextSpan(
-                                      text:"操作状态: ",
+                                      text:"状态: ",
                                       style:TextStyle(
                                         color:Colors.black,
                                         fontWeight: FontWeight.bold,
@@ -154,7 +164,7 @@ class _ServiceInfoPageState extends State<ServiceInfoPage>{
                       child:Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children:[
-                          Text("地址信息",style:TextStyle(color:Colors.green,fontWeight: FontWeight.bold,fontSize: 16)),
+                          IconText(" 地址信息",icon:Icon(Icons.home),style:TextStyle(color:Colors.green,fontWeight: FontWeight.bold,fontSize: 16)),
                           Text.rich(TextSpan(
                               children:[
                                 TextSpan(
@@ -234,7 +244,7 @@ class _ServiceInfoPageState extends State<ServiceInfoPage>{
                           Text.rich(TextSpan(
                               children:[
                                 TextSpan(
-                                  text:"消息类型: ",
+                                  text:"请求类型: ",
                                   style:TextStyle(
                                     color:Colors.black,
                                     fontWeight: FontWeight.bold,

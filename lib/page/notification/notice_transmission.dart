@@ -27,7 +27,7 @@ class _TransmissionPageState extends State<TransmissionPage>{
                       //child:Expanded(
                       child:PaginatedDataTable(
                         rowsPerPage: tmp.length<=6?tmp.length:6,
-                        header: Text("Transmissions"),
+                        header: Text("传输消息"),
                         headingRowHeight: 24.0,
                         horizontalMargin: 8.0,
                         dataRowHeight: 60.0,
@@ -53,7 +53,7 @@ class _TransmissionPageState extends State<TransmissionPage>{
                       //child:Expanded(
                       child:PaginatedDataTable(
                         rowsPerPage: 1,
-                        header: Text("Transmissions"),
+                        header: Text("传输消息"),
                         headingRowHeight: 24.0,
                         horizontalMargin: 8.0,
                         dataRowHeight: 60.0,
@@ -65,7 +65,7 @@ class _TransmissionPageState extends State<TransmissionPage>{
                               }
                           ),
                         ],
-                        columns: [DataColumn(label:Text("传输信息"))],
+                        columns: [DataColumn(label:Text("所有消息"))],
                         source: MyTransmissionSource(tmp),
                       ),
                       //),

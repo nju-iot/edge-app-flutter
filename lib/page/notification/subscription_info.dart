@@ -26,12 +26,13 @@ class _SubInfoPageState extends State<SubInfoPage>{
 
   @override
   Widget build(BuildContext context) {
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
     GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     void _forSubmitted(){
       var _form = formKey.currentState;
       if(_form.validate()){
-        postTmp['subscribedLabels'] = tmp['subscribedLabels'];
+        //postTmp['subscribedLabels'] = tmp['subscribedLabels'];
         MyHttp.putJson('/support-notification/api/v1/subscription',postTmp).catchError((error){
           MyHttp.handleError(error);
           return showDialog<bool>(
@@ -60,6 +61,14 @@ class _SubInfoPageState extends State<SubInfoPage>{
     return Scaffold(
       appBar:AppBar(
         title:Text("详情"),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              appBarColor[800],
+              appBarColor[200],
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.delete),
@@ -107,8 +116,8 @@ class _SubInfoPageState extends State<SubInfoPage>{
               'id':tmp['id'],
               'receiver':tmp['receiver'],
               'description':tmp['description'],
-              'subscribedLabels':tmp['subscribedLabels'],
-              'subscribedCategories':tmp['subscribedCategories'],
+              'subscribedLabels':tmp['subscribedLabels']==null?[]:tmp['subscribedLabels'],
+              'subscribedCategories':tmp['subscribedCategories']==null?[]:tmp['subscribedCategories'],
               'channels':tmp['channels'],
             };
             var subLabels = tmp['subscribedLabels']==null?'无':tmp['subscribedLabels'].toString().substring(1,tmp['subscribedLabels'].toString().length-1);
@@ -169,12 +178,12 @@ class _SubInfoPageState extends State<SubInfoPage>{
                                     postTmp['description'] = val;
                                   },
                                 ),
-                                SizedBox(height:10),
+                                SizedBox(height:30),
                                 Text("订阅类别",style:TextStyle(color:Colors.black,fontSize: 14)),
-                                MySubCategories(tmp, subCata),
+                                MySubCategories(postTmp, subCata),
 
                                 Text("订阅标签",style:TextStyle(color:Colors.black,fontSize: 14)),
-                                MySubLabel(tmp,subLabels),
+                                MySubLabel(postTmp,subLabels),
                               ]
                           )
                         )
@@ -222,6 +231,8 @@ class _MySubCategoriesState extends State<MySubCategories>{
 
   @override
   Widget build(BuildContext context) {
+    print(flag_SECURITY);
+    print(widget.tmp);
     return ExpansionTile(
         title:Text("点击选择"),
         backgroundColor: Colors.grey,

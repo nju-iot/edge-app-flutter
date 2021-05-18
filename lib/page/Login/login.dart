@@ -27,10 +27,19 @@ class _LoginPageState extends State<LoginPage>{
 
   @override
   Widget build(BuildContext context) {
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
     return WillPopScope(
         child: Scaffold(
           appBar: AppBar(
             // leading: _leading(context),
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [
+                  appBarColor[800],
+                  appBarColor[200],
+                ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+              ),
+            ),
             title: Text("登录"),
             actions: <Widget>[
               FlatButton(
@@ -75,7 +84,7 @@ class _LoginPageState extends State<LoginPage>{
               controller: _unameController,
               decoration: InputDecoration(
                   labelText: "用户名",
-                  hintText: "密码",
+                  hintText: "请输入用户名",
                   hintStyle: TextStyle(fontSize: 12),
                   icon: Icon(Icons.person)),
               //校验用户名

@@ -2,8 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/utils/provider.dart';
 
-///学flutter的时候学着示例模板写的，以后不用的话，删改即可
-
+//学flutter的时候学着教程示例写的
 class ThemeColorPage extends StatefulWidget{
   @override
   _ThemeColorPageState createState() => _ThemeColorPageState();

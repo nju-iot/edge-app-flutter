@@ -34,7 +34,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>{
                       //child:Expanded(
                       child:PaginatedDataTable(
                         rowsPerPage: tmp.length<=6?tmp.length:6,
-                        header: Text("Subscriptions"),
+                        header: Text("订阅"),
                         headingRowHeight: 24.0,
                         horizontalMargin: 8.0,
                         dataRowHeight: 60.0,
@@ -96,7 +96,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>{
                       //child:Expanded(
                       child:PaginatedDataTable(
                         rowsPerPage: 1,
-                        header: Text("Subscriptions"),
+                        header: Text("订阅消息"),
                         headingRowHeight: 24.0,
                         horizontalMargin: 8.0,
                         dataRowHeight: 60.0,
@@ -108,7 +108,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>{
                               }
                           ),
                         ],
-                        columns: [DataColumn(label:Text("订阅消息"))],
+                        columns: [DataColumn(label:Text("所有订阅"))],
                         source: MySubscriptionSource(tmp),
                       ),
                       //),
@@ -156,18 +156,21 @@ class MySubscriptionSource extends DataTableSource{
         },
         cells:[
           DataCell(
-            ListTile(
-              onTap:(){},
-              //leading:Text("#${index+1}"),
-              title:Text("${data[index]['slug'].toString()}",style:TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text("id: ${data[index]['id'].toString()}"),
-              trailing:IconButton(
-                icon:Icon(Icons.arrow_forward_ios),
-                onPressed: (){
-                  MyRouter.push(Routes.subInfoPage(id:"${data[index]['id'].toString()}"));
-                },
+            SizedBox(
+              width:336.0,
+              child:ListTile(
+                onTap:(){},
+                //leading:Text("#${index+1}"),
+                title:Text("订阅消息${data[index]['slug'].toString().substring(19)}",style:TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text("id: ${data[index]['id'].toString()}",maxLines:2,overflow: TextOverflow.ellipsis,),
+                trailing:IconButton(
+                  icon:Icon(Icons.arrow_forward_ios),
+                  onPressed: (){
+                    MyRouter.push(Routes.subInfoPage(id:"${data[index]['id'].toString()}"));
+                  },
+                ),
               ),
-            ),
+            )
           ),
         ]
     );

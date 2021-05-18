@@ -6,7 +6,6 @@ import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
 
 var tmp;
-List<String> willBeDeleted = [];
 class DeviceProfilePage extends StatefulWidget{
   @override
   _DeviceProfilePageState createState() => _DeviceProfilePageState();
@@ -14,7 +13,7 @@ class DeviceProfilePage extends StatefulWidget{
 }
 
 class _DeviceProfilePageState extends State<DeviceProfilePage>{
-
+  List<String> willBeDeleted = [];
   @override
   Widget build(BuildContext context){
     //var tmp;
@@ -33,7 +32,7 @@ class _DeviceProfilePageState extends State<DeviceProfilePage>{
                           //child:Expanded(
                             child:PaginatedDataTable(
                               rowsPerPage: tmp.length<=6?tmp.length:6,
-                              header: Text("DeviceProfile"),
+                              header: Text("设备描述文件"),
                               headingRowHeight: 24.0,
                               horizontalMargin: 8.0,
                               dataRowHeight: 60.0,
@@ -101,7 +100,7 @@ class _DeviceProfilePageState extends State<DeviceProfilePage>{
                                   },
                                 ),
                               ],
-                              columns: [DataColumn(label:Text("设备描述信息"))],
+                              columns: [DataColumn(label:Text("基本信息"))],
                               source: MyProfileSource(tmp),
                             ),
                           //),
@@ -123,7 +122,7 @@ class _DeviceProfilePageState extends State<DeviceProfilePage>{
                               }
                             ),
                           ],
-                          columns: [DataColumn(label:Text("设备描述信息"))],
+                          columns: [DataColumn(label:Text("基本信息"))],
                           source: MyProfileSource(tmp),
                         ),
                       //),
@@ -167,18 +166,22 @@ class MyProfileSource extends DataTableSource{
         },
         cells:[
           DataCell(
-            ListTile(
-              onTap:(){},
-              //leading:Text("#${index+1}"),
-              title:Text("${data[index]['name'].toString()}",style:TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text("id: ${data[index]['id'].toString()}"),
-              trailing:IconButton(
-                icon:Icon(Icons.arrow_forward_ios),
-                onPressed: (){
-                  MyRouter.push(Routes.profileInfoPage(name:"${data[index]['name'].toString()}"));
-                },
+            SizedBox(
+              width:336.0,
+              child:ListTile(
+                onTap:(){},
+                //leading:Text("#${index+1}"),
+                //visualDensity: VisualDensity(horizontal: -4),
+                title:Text("${data[index]['name'].toString()}",style:TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text("id: ${data[index]['id'].toString()}",maxLines: 2,overflow: TextOverflow.ellipsis,),
+                trailing:IconButton(
+                  icon:Icon(Icons.arrow_forward_ios),
+                  onPressed: (){
+                    MyRouter.push(Routes.profileInfoPage(name:"${data[index]['name'].toString()}"));
+                  },
+                ),
               ),
-            ),
+            )
           ),
         ]
     );

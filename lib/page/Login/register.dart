@@ -18,8 +18,19 @@ class _RegisterState extends State<RegisterPage>{
 
   @override
   Widget build(BuildContext context) {
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
     return Scaffold(
-      appBar: AppBar(title: Text("注册")),
+      appBar: AppBar(
+        title: Text("注册"),
+          flexibleSpace: Container(
+          decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [
+          appBarColor[800],
+          appBarColor[200],
+          ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          ),
+        ),
+      ),
       body: GestureDetector(
         onTap: () {
           // 点击空白页面关闭键盘
