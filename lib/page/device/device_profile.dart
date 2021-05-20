@@ -4,6 +4,7 @@ import 'package:flutter_app/http.dart';
 import 'package:flutter_app/page/notification/notice_notification.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 var tmp;
 class DeviceProfilePage extends StatefulWidget{
@@ -42,6 +43,14 @@ class _DeviceProfilePageState extends State<DeviceProfilePage>{
                                     onPressed: (){
                                       setState(() {
                                         willBeDeleted = [];
+                                        Fluttertoast.showToast(
+                                            msg: "刷新成功",
+                                            gravity: ToastGravity.CENTER,
+                                            timeInSecForIosWeb: 1,
+                                            backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                            textColor: Colors.white,
+                                            fontSize: 16.0
+                                        );
                                       });
                                     }
                                 ),
@@ -87,10 +96,23 @@ class _DeviceProfilePageState extends State<DeviceProfilePage>{
                                                 child: Text('确认'),
                                                 onPressed: () {
                                                   for(int i=0;i<willBeDeleted.length;i++){
-                                                    MyHttp.delete('/core-metadata/api/v1/deviceprofile/id/${willBeDeleted[i]}');
+                                                    MyHttp.delete('/core-metadata/api/v1/deviceprofile/id/${willBeDeleted[i]}').then((value){
+                                                      if(i==willBeDeleted.length-1){
+                                                        willBeDeleted = [];
+                                                        Navigator.of(context).pop(true);
+                                                        setState(() {
+                                                          Fluttertoast.showToast(
+                                                              msg: "删除成功",
+                                                              gravity: ToastGravity.CENTER,
+                                                              timeInSecForIosWeb: 1,
+                                                              backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                                              textColor: Colors.white,
+                                                              fontSize: 16.0
+                                                          );
+                                                        });
+                                                      }
+                                                    });
                                                   }
-                                                  willBeDeleted = [];
-                                                  Navigator.of(context).pop(true);
                                                 },
                                               ),
                                             ],

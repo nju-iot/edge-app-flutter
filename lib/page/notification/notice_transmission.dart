@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../http.dart';
 
@@ -35,7 +36,16 @@ class _TransmissionPageState extends State<TransmissionPage>{
                           IconButton(
                               icon: Icon(Icons.refresh),
                               onPressed: (){
-                                setState(() {});
+                                setState(() {
+                                  Fluttertoast.showToast(
+                                      msg: "刷新成功",
+                                      gravity: ToastGravity.SNACKBAR,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
+                                });
                               }
                           ),
                           IconButton(
@@ -61,7 +71,16 @@ class _TransmissionPageState extends State<TransmissionPage>{
                           IconButton(
                               icon: Icon(Icons.refresh),
                               onPressed: (){
-                                setState(() {});
+                                setState(() {
+                                  Fluttertoast.showToast(
+                                      msg: "刷新成功",
+                                      gravity: ToastGravity.SNACKBAR,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
+                                });
                               }
                           ),
                         ],

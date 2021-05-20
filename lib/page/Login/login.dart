@@ -5,6 +5,7 @@ import 'package:flutter_app/http.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
 import 'package:flutter_app/utils/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -164,6 +165,14 @@ class _LoginPageState extends State<LoginPage>{
     if(truePwd==_pwdController.text){
       userProfile.userName = _unameController.text;
       MyRouter.replace(Routes.indexPage);
+      Fluttertoast.showToast(
+          msg: "登录成功",
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
     }
   }
 }

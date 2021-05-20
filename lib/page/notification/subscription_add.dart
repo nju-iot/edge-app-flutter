@@ -1,6 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_app/http.dart';
+import 'package:flutter_app/router/route_map.gr.dart';
+import 'package:flutter_app/router/router.dart';
+import 'package:flutter_app/widget/icon_with_text.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 
 Map<String,dynamic> postTmp;
@@ -50,9 +54,21 @@ class _SubAddPageState extends State<SubAddPage>{
                 );
               }
           );
+        }).then((value){
+          _form.save();
+          Navigator.of(context).pop(true);
+          setState(() {
+            //MyRouter.replace(Routes);
+            Fluttertoast.showToast(
+                msg: "添加成功",
+                gravity: ToastGravity.CENTER,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                textColor: Colors.white,
+                fontSize: 16.0
+            );
+          });
         });
-        _form.save();
-        Navigator.of(context).pop(true);
       }
 
     }
@@ -96,6 +112,7 @@ class _SubAddPageState extends State<SubAddPage>{
                           //contentPadding: EdgeInsets.all(10.0),
                           labelText: "slug",
                           labelStyle: TextStyle(color:Colors.black),
+                          icon:Icon(Icons.perm_device_info)
                         ),
                         style: TextStyle(color:Colors.grey),
                         initialValue: slug,
@@ -107,6 +124,7 @@ class _SubAddPageState extends State<SubAddPage>{
                           labelStyle: TextStyle(color:Colors.black),
                           hintText: "请输入名称",
                           errorText:"此为必填项",
+                          icon:Icon(Icons.device_unknown)
                         ),
                         //textInputAction: TextInputAction.done,
                         onChanged: (val){
@@ -117,6 +135,7 @@ class _SubAddPageState extends State<SubAddPage>{
                         decoration:InputDecoration(
                           labelText: "描述",
                           labelStyle: TextStyle(color:Colors.black,fontSize: 14),
+                          icon:Icon(Icons.description_outlined)
                         ),
 
                         onChanged: (val){
@@ -124,11 +143,20 @@ class _SubAddPageState extends State<SubAddPage>{
                         },
                       ),
                       SizedBox(height:30),
-                      Text("订阅类别",style:TextStyle(color:Colors.black,fontSize: 14)),
-                      MyCata(postTmp),
 
-                      Text("订阅标签",style:TextStyle(color:Colors.black,fontSize: 14)),
-                      MyAddLabel(postTmp, subLabels),
+                      Container(
+                        padding: EdgeInsets.only(left:40.0),
+                        child:Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children:<Widget>[
+                            IconText(" 订阅类别",icon:Icon(Icons.category),style:TextStyle(color:Colors.black,fontSize: 14)),
+                            MyCata(postTmp),
+                            IconText(" 订阅标签",icon:Icon(Icons.label),style:TextStyle(color:Colors.black,fontSize: 14)),
+                            MyAddLabel(postTmp, subLabels),
+                          ]
+                        )
+                      )
+
                     ],
                   ),
                   onWillPop: () async{

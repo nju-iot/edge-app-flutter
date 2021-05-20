@@ -3,6 +3,7 @@ import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../http.dart';
 
@@ -29,7 +30,8 @@ class _NotificationPageState extends State<NotificationPage>{
     return Scaffold(
         body:ListView(
             children:<Widget>[
-              FutureBuilder(
+              NoticeListBaseWidget(tmp),
+              /*FutureBuilder(
                 future:MyHttp.get('/support-notification/api/v1/notification/end/${DateTime.now().millisecondsSinceEpoch}/50'),
                 builder: (BuildContext context,AsyncSnapshot snapshot){
                   if(snapshot.hasData){
@@ -63,11 +65,16 @@ class _NotificationPageState extends State<NotificationPage>{
                     //return Text("暂无数据");
                   }
                 },
-              ),
+              ),*/
             ]
         )
     );
   }
+
+
+
+
+
 }
 
 class MyNotificationSource extends DataTableSource{
@@ -256,10 +263,10 @@ class _NoticeListState extends State<NoticeListBaseWidget>{
                     setState(() {
                       var items = [];
                       if(_selectStart.millisecondsSinceEpoch<_selectEnd.millisecondsSinceEpoch){
-                        for(int i=0;i<widget.data.length;i++){
-                          var created = widget.data[i]['created'];
+                        for(int i=0;i<tmp.length;i++){
+                          var created = tmp[i]['created'];
                           if(created>_selectStart.millisecondsSinceEpoch&&created<_selectEnd.millisecondsSinceEpoch){
-                            items.add(widget.data[i]);
+                            items.add(tmp[i]);
                           }
                         }
                         temp = items;
@@ -277,8 +284,140 @@ class _NoticeListState extends State<NoticeListBaseWidget>{
 
   @override
   Widget build(BuildContext context) {
-    
-    return Container(
+    //print(1);
+    return FutureBuilder(
+      future:MyHttp.get('/support-notification/api/v1/notification/end/${DateTime.now().millisecondsSinceEpoch}/100'),
+      builder: (BuildContext context,AsyncSnapshot snapshot){
+        if(snapshot.hasData){
+          tmp = snapshot.data;
+          for(int i=0;i<tmp.length;i++){
+            tmp[i]['selected'] = false;
+          }
+          return Container(
+            //child:Expanded(
+            child:PaginatedDataTable(
+              rowsPerPage: searched==true?(temp.length==0?1:temp.length<=6?temp.length:6):(tmp.length<=6?tmp.length:6),
+              header: Text("通知消息"),
+              headingRowHeight: 24.0,
+              horizontalMargin: 8.0,
+              dataRowHeight: 60.0,
+              actions:<Widget>[
+                IconButton(
+                    icon: Icon(Icons.refresh),
+                    onPressed: (){
+                      setState(() {
+                        searched = false;
+                        _selectStart = DateTime.now();
+                        _selectEnd = DateTime.now();
+                        willBeDeleted = [];
+                      });
+                      Fluttertoast.showToast(
+                          msg: "刷新成功",
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                          textColor: Colors.white,
+                          fontSize: 16.0
+                      );
+                    }
+                ),
+                IconButton(
+                  icon:Icon(Icons.delete),
+                  onPressed:() async{
+                    return await showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('提示'),
+                            content: Text('是否要删除选定的消息？'),
+                            actions: <Widget>[
+                              FlatButton(
+                                child: Text('取消'),
+                                onPressed: () {
+                                  Navigator.of(context).pop(true);
+                                },
+                              ),
+                              FlatButton(
+                                child: Text('确认'),
+                                onPressed: () {
+                                  for(int i=0;i<willBeDeleted.length;i++){
+                                    MyHttp.delete('/support-notification/api/v1/notification/slug/${willBeDeleted[i]}').then((value) {
+                                      if(i==willBeDeleted.length-1){
+                                        willBeDeleted = [];
+                                        Navigator.of(context).pop(true);
+                                        MyRouter.replace(Routes.noticePage);
+                                        setState(() {
+                                          Fluttertoast.showToast(
+                                              msg: "删除成功",
+                                              gravity: ToastGravity.CENTER,
+                                              timeInSecForIosWeb: 1,
+                                              backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                              textColor: Colors.white,
+                                              fontSize: 16.0
+                                          );
+                                        });
+                                      }
+                                    });
+                                  }
+                                },
+                              ),
+                            ],
+                          );
+                        }
+                    );
+                  },
+                ),
+                IconButton(
+                  icon:Icon(Icons.search),
+                  onPressed: () {
+                    return showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return StatefulBuilder(
+                              builder: (context,state){
+                                //return timepicker(state);
+                                return Container(
+                                  child:timepicker(state),
+                                );
+                              }
+                          );
+                        }
+                    );
+                  },
+                ),
+              ],
+              columns: [DataColumn(label:Text("    由新到旧（仅展示最近100条）"))],
+              source: searched==true?MyNotificationSource(temp):MyNotificationSource(tmp),//MyNotificationSource(items),
+            ),
+            //),
+          );
+        }else{
+          return Container(
+            //child:Expanded(
+            child:PaginatedDataTable(
+              rowsPerPage: 1,
+              header: Text("通知消息"),
+              headingRowHeight: 24.0,
+              horizontalMargin: 8.0,
+              dataRowHeight: 60.0,
+              actions:<Widget>[
+                IconButton(
+                    icon: Icon(Icons.refresh),
+                    onPressed: (){
+                      setState(() {});
+                    }
+                ),
+              ],
+              columns: [DataColumn(label:Text("由新到旧（仅展示最近50条）"))],
+              source: MyNotificationSource(tmp),
+            ),
+            //),
+          );
+          //return Text("暂无数据");
+        }
+      },
+    );
+    /*return Container(
       //child:Expanded(
       child:PaginatedDataTable(
         rowsPerPage: searched==true?(temp.length==0?1:temp.length<=6?temp.length:6):(tmp.length<=6?tmp.length:6),
@@ -322,6 +461,9 @@ class _NoticeListState extends State<NoticeListBaseWidget>{
                             }
                             willBeDeleted = [];
                             Navigator.of(context).pop(true);
+                            setState(() {
+
+                            });
                           },
                         ),
                       ],
@@ -353,7 +495,7 @@ class _NoticeListState extends State<NoticeListBaseWidget>{
         source: searched==true?MyNotificationSource(temp):MyNotificationSource(tmp),//MyNotificationSource(items),
       ),
       //),
-    );
+    );*/
   }
 }
 

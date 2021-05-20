@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../http.dart';
 
@@ -44,6 +45,14 @@ class _SubscriptionPageState extends State<SubscriptionPage>{
                               onPressed: (){
                                 setState(() {
                                   willBeDeleted = [];
+                                  Fluttertoast.showToast(
+                                      msg: "刷新成功",
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
                                 });
                               }
                           ),
@@ -73,10 +82,23 @@ class _SubscriptionPageState extends State<SubscriptionPage>{
                                           child: Text('确认'),
                                           onPressed: () {
                                             for(int i=0;i<willBeDeleted.length;i++){
-                                              MyHttp.delete('/support-notification/api/v1/subscription/${willBeDeleted[i]}');
+                                              MyHttp.delete('/support-notification/api/v1/subscription/${willBeDeleted[i]}').then((value){
+                                                if(i==willBeDeleted.length-1){
+                                                  willBeDeleted = [];
+                                                  Navigator.of(context).pop(true);
+                                                  setState(() {
+                                                    Fluttertoast.showToast(
+                                                        msg: "删除成功",
+                                                        gravity: ToastGravity.CENTER,
+                                                        timeInSecForIosWeb: 1,
+                                                        backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                                        textColor: Colors.white,
+                                                        fontSize: 16.0
+                                                    );
+                                                  });
+                                                }
+                                              });
                                             }
-                                            willBeDeleted = [];
-                                            Navigator.of(context).pop(true);
                                           },
                                         ),
                                       ],

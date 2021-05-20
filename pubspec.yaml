@@ -38,6 +38,7 @@ dependencies:
   flutter_easyrefresh: ^2.1.6
   flutter_svg: ^0.14.1
   flutter_swiper: ^1.1.6
+  fluttertoast: ^7.1.8
   flutter_webview_plugin: ^0.3.11
   font_awesome_flutter: ^8.8.1
   http: ^0.12.0

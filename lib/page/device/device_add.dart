@@ -5,6 +5,7 @@ import 'package:flutter_app/page/device/device_info.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
 import 'package:flutter_app/widget/icon_with_text.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
 
 Map<String,dynamic> postTmp;
@@ -105,9 +106,21 @@ class _DeviceAddPageState extends State<DeviceAddPage>{
                 );
               }
           );
+        }).then((value){
+          _form.save();
+          Navigator.of(context).pop(true);
+          setState(() {
+            MyRouter.replace(Routes.devicePage);
+            Fluttertoast.showToast(
+                msg: "添加成功",
+                gravity: ToastGravity.CENTER,
+                timeInSecForIosWeb: 1,
+                backgroundColor: appBarColor.withOpacity(.5),
+                textColor: Colors.white,
+                fontSize: 16.0
+            );
+          });
         });
-        _form.save();
-        Navigator.of(context).pop(true);
         //MyRouter.replace(Routes.devicePage);
       }
     }

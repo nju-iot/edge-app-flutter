@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/http.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'dart:math' as math;
 
@@ -41,6 +42,14 @@ class DeviceListPageState extends State<DeviceListPage>{
       return Future.delayed(Duration(seconds: 5),(){   // 延迟5s完成刷新
         setState(() {
           searched = false;//重置筛选状态
+          Fluttertoast.showToast(
+              msg: "刷新成功",
+              gravity: ToastGravity.SNACKBAR,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
         });
       });
     }

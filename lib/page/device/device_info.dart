@@ -6,6 +6,7 @@ import 'package:flutter_app/page/device/device_add.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
 import 'package:flutter_app/widget/icon_with_text.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 var tmp;
@@ -102,6 +103,15 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
                 );
               }
           );
+        }).then((value) {
+          Fluttertoast.showToast(
+              msg: "修改成功",
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
         });
         _form.save();
         Navigator.of(context).pop(true);
@@ -138,9 +148,21 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
                           FlatButton(
                             child: Text('确认'),
                             onPressed: () {
-                              MyHttp.delete('/core-metadata/api/v1/device/name/${widget.name}');
-                              Navigator.of(context).pop(true);
-                              Navigator.of(context).pop(true);
+                              MyHttp.delete('/core-metadata/api/v1/device/name/${widget.name}').then((value){
+                                Navigator.of(context).pop(true);
+                                Navigator.of(context).pop(true);
+                                setState(() {
+                                  MyRouter.replace(Routes.devicePage);
+                                  Fluttertoast.showToast(
+                                      msg: "删除成功",
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: appBarColor.withOpacity(.5),
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
+                                });
+                              });
                             },
                           ),
                         ],

@@ -1,6 +1,10 @@
 import 'package:auto_route/auto_route_annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/http.dart';
+import 'package:flutter_app/router/route_map.gr.dart';
+import 'package:flutter_app/router/router.dart';
+import 'package:flutter_app/widget/icon_with_text.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class NotificationInfoPage extends StatefulWidget{
   final String slug;
@@ -56,9 +60,21 @@ class _NotificationInfoPageState extends State<NotificationInfoPage>{
                         FlatButton(
                           child: Text('确认'),
                           onPressed: () {
-                            MyHttp.delete('/support-notification/api/v1/notification/slug/${widget.slug}');
-                            Navigator.of(context).pop(true);
-                            Navigator.of(context).pop(true);
+                            MyHttp.delete('/support-notification/api/v1/notification/slug/${widget.slug}').then((value){
+                              Navigator.of(context).pop(true);
+                              Navigator.of(context).pop(true);
+                              setState(() {
+                                MyRouter.replace(Routes.noticePage);
+                                Fluttertoast.showToast(
+                                    msg: "删除成功",
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                    textColor: Colors.white,
+                                    fontSize: 16.0
+                                );
+                              });
+                            });
                           },
                         ),
                       ],
@@ -85,7 +101,7 @@ class _NotificationInfoPageState extends State<NotificationInfoPage>{
                       child:Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children:<Widget>[
-                          Text("基本信息",style:TextStyle(color:Colors.green,fontWeight: FontWeight.bold,fontSize: 16)),
+                          IconText("基本信息",icon:Icon(Icons.info),style:TextStyle(color:Colors.green,fontWeight: FontWeight.bold,fontSize: 16)),
                           Text.rich(TextSpan(
                             children:[
                               TextSpan(
@@ -189,7 +205,7 @@ class _NotificationInfoPageState extends State<NotificationInfoPage>{
                       child:Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children:[
-                          Text("详细信息",style:TextStyle(color:Colors.green,fontWeight:FontWeight.bold,fontSize: 16)),
+                          IconText("详细信息",icon:Icon(Icons.description),style:TextStyle(color:Colors.green,fontWeight:FontWeight.bold,fontSize: 16)),
                           Text.rich(TextSpan(
                               children:[
                                 TextSpan(

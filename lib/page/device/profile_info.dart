@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route_annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/widget/icon_with_text.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../http.dart';
 
@@ -57,9 +58,18 @@ class _ProfileInfoPageState extends State<ProfileInfoPage>{
                         FlatButton(
                           child: Text('确认'),
                           onPressed: () {
-                            MyHttp.delete('/core-metadata/api/v1/deviceprofile/name/${widget.profileName}');
-                            Navigator.of(context).pop(true);
-                            Navigator.of(context).pop(true);
+                            MyHttp.delete('/core-metadata/api/v1/deviceprofile/name/${widget.profileName}').then((value){
+                              Navigator.of(context).pop(true);
+                              Navigator.of(context).pop(true);
+                              Fluttertoast.showToast(
+                                  msg: "删除成功",
+                                  gravity: ToastGravity.CENTER,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                  textColor: Colors.white,
+                                  fontSize: 16.0
+                              );
+                            });
                           },
                         ),
                       ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/http.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class DeviceServicePage extends StatefulWidget{
   @override
@@ -33,7 +34,16 @@ class _DeviceServicePageState extends State<DeviceServicePage>{
                           IconButton(
                               icon: Icon(Icons.refresh),
                               onPressed: (){
-                                setState(() {});
+                                setState(() {
+                                  Fluttertoast.showToast(
+                                      msg: "刷新成功",
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
+                                });
                               }
                           ),
                           IconButton(
@@ -75,7 +85,16 @@ class _DeviceServicePageState extends State<DeviceServicePage>{
                             IconButton(
                                 icon: Icon(Icons.refresh),
                                 onPressed: (){
-                                  setState(() {});
+                                  setState(() {
+                                    Fluttertoast.showToast(
+                                        msg: "刷新成功",
+                                        gravity: ToastGravity.CENTER,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                        textColor: Colors.white,
+                                        fontSize: 16.0
+                                    );
+                                  });
                                 }
                             ),
                           ],

@@ -174,8 +174,18 @@ class _HomeRouteState extends State<HomeRoute>{
                             child:Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children:<Widget>[
-                                Text("0",style:TextStyle(fontSize: 24,color: Colors.white70)),
-                                Text("告警中", style:TextStyle(color: Colors.white70)),
+                                FutureBuilder(
+                                  future:MyHttp.get('/core-metadata/api/v1/deviceservice'),
+                                  builder:(BuildContext context,AsyncSnapshot snapshot){
+                                    if(snapshot.hasData){
+                                    var tmp = snapshot.data;
+                                    return Text("${tmp.length}",style:TextStyle(fontSize: 24,color: Colors.white70));
+                                  }else{
+                                    return Text("0",style:TextStyle(fontSize: 24,color: Colors.white70));
+                                    }
+                                  }
+                                ),
+                                Text("设备服务", style:TextStyle(color: Colors.white70)),
                               ]
                             )
                           ),

@@ -62,7 +62,7 @@ class _DevicePageState extends State<DevicePage> with SingleTickerProviderStateM
       body:TabBarView(
         controller:_tabController,
         children:<Widget>[
-           DeviceListPage(),
+          DeviceListPage(),
           DeviceServicePage(),
           DeviceProfilePage(),
         ],
