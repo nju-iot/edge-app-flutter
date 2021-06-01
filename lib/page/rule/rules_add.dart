@@ -192,8 +192,9 @@ class _RulesAddPageState extends State<RulesAddPage> {
                           _actionConfigStateKey.currentState.addMQTTConfig();
                           break;
                       }
+                      FocusScope.of(context).requestFocus(new FocusNode());
                     },
-                    child: Text("添加行动")),
+                    child: Text("Select Actions")),
                 ActionConfigWidget(
                   key: _actionConfigStateKey,
                 ),
