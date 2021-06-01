@@ -48,7 +48,8 @@ class _StreamInfoPageState extends State<StreamInfoPage> {
                     padding: EdgeInsets.symmetric(
                         horizontal: MediaQuery.of(context).size.width * 0.05),
                     decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: Colors.blue),
+                      border: Border.all(
+                          width: 1, color: Theme.of(context).primaryColor),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(

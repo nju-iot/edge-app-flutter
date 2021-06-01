@@ -74,7 +74,9 @@ class _RuleInfoPageState extends State<RuleInfoPage> {
                               right: MediaQuery.of(context).size.width * 0.05,
                               top: 10),
                           decoration: BoxDecoration(
-                            border: Border.all(width: 1, color: Colors.blue),
+                            border: Border.all(
+                                width: 1,
+                                color: Theme.of(context).primaryColor),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Column(
@@ -83,7 +85,7 @@ class _RuleInfoPageState extends State<RuleInfoPage> {
                                 e.entries.first.key.toString(),
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.blue,
+                                    color: Theme.of(context).primaryColor,
                                     fontSize: 20),
                               ),
                               Column(
@@ -111,7 +113,8 @@ class _RuleInfoPageState extends State<RuleInfoPage> {
                         right: MediaQuery.of(context).size.width * 0.05,
                       ),
                       decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Colors.blue),
+                        border: Border.all(
+                            width: 1, color: Theme.of(context).primaryColor),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
@@ -139,7 +142,8 @@ class _RuleInfoPageState extends State<RuleInfoPage> {
                           disabledBorder: ent.key.toString() == "sql"
                               ? OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(color: Colors.blue),
+                                  borderSide: BorderSide(
+                                      color: Theme.of(context).primaryColor),
                                 )
                               : null,
                         ),

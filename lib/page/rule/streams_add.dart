@@ -105,12 +105,12 @@ class _StreamsAddPageState extends State<StreamsAddPage> {
             decoration: InputDecoration(
               floatingLabelBehavior: FloatingLabelBehavior.always,
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.blueAccent),
+                borderSide: BorderSide(color: Theme.of(context).accentColor),
                 borderRadius: BorderRadius.circular(8),
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.blue),
+                borderSide: BorderSide(color: Theme.of(context).primaryColor),
               ),
               labelText: "SQL",
               labelStyle:

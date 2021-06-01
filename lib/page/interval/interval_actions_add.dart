@@ -498,7 +498,8 @@ class _TargetConfigWidgetState extends State<TargetConfigWidget> {
       padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        border: new Border.all(color: Colors.blueAccent, width: 0.5),
+        border:
+            new Border.all(color: Theme.of(context).primaryColor, width: 0.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -506,7 +507,8 @@ class _TargetConfigWidgetState extends State<TargetConfigWidget> {
           Container(
             child: Text(
               "TargetConfig",
-              style: TextStyle(color: Colors.blueAccent, fontSize: 20.0),
+              style: TextStyle(
+                  color: Theme.of(context).primaryColor, fontSize: 20.0),
             ),
           ),
           TextFormField(

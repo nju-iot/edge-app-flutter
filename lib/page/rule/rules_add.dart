@@ -151,11 +151,13 @@ class _RulesAddPageState extends State<RulesAddPage> {
                       hintText: "规则 SQL，如：SELECT * FROM demo",
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.blueAccent),
+                        borderSide:
+                            BorderSide(color: Theme.of(context).accentColor),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.blue),
+                        borderSide:
+                            BorderSide(color: Theme.of(context).primaryColor),
                       ),
                       labelText: "Sql",
                       labelStyle: TextStyle(
@@ -182,8 +184,8 @@ class _RulesAddPageState extends State<RulesAddPage> {
                   ),
                 ),
                 FlatButton(
-                    color: Colors.blue,
-                    highlightColor: Colors.blue[700],
+                    color: Theme.of(context).buttonColor,
+                    highlightColor: Theme.of(context).buttonColor,
                     colorBrightness: Brightness.dark,
                     splashColor: Colors.grey,
                     onPressed: () async {
@@ -430,7 +432,7 @@ class _EdgeXMessageBusConfigWidgetState
     //print('${widget.index} build, ${widget.protocolController.text}, ${controllerB.text}');
     return Container(
       decoration: BoxDecoration(
-          border: Border.all(color: Colors.blue),
+          border: Border.all(color: Theme.of(context).primaryColor),
           borderRadius: BorderRadius.circular(8)),
       padding: EdgeInsets.symmetric(vertical: 20),
       margin: EdgeInsets.only(
@@ -581,7 +583,7 @@ class _MQTTConfigWidgetState extends State<MQTTConfigWidget> {
         right: MediaQuery.of(context).size.width * 0.05,
       ),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.blue),
+        border: Border.all(color: Theme.of(context).primaryColor),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Form(
@@ -722,7 +724,7 @@ class _RestHTTPConfigWidgetState extends State<RestHTTPConfigWidget> {
         right: MediaQuery.of(context).size.width * 0.05,
       ),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.blue),
+        border: Border.all(color: Theme.of(context).primaryColor),
         borderRadius: BorderRadius.circular(8),
       ),
       child: ListTile(
@@ -734,7 +736,7 @@ class _RestHTTPConfigWidgetState extends State<RestHTTPConfigWidget> {
               Container(
                 child: Text("RestHTTPConfig",
                     style: TextStyle(
-                        color: Colors.blue,
+                        color: Theme.of(context).primaryColor,
                         fontSize: 20,
                         fontWeight: FontWeight.bold)),
               ),
@@ -1053,11 +1055,13 @@ class _RestHTTPConfigWidgetState extends State<RestHTTPConfigWidget> {
                       labelText: "Parameter",
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.blueAccent),
+                        borderSide:
+                            BorderSide(color: Theme.of(context).accentColor),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.blue),
+                        borderSide:
+                            BorderSide(color: Theme.of(context).primaryColor),
                       ),
                     ),
                     maxLines: null,
