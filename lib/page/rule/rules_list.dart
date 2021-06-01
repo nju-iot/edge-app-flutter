@@ -93,33 +93,39 @@ class _RuleListPageState extends State<RuleListPage> {
                       IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () async {
-                          for (String ruleId in _selectedToDelete) {
-                            await MyHttp.delete(
-                                    '/rule-engine/rules/${ruleId.toString()}')
-                                .catchError((error) {
-                              print(error);
-                              print(error.response);
-                              showDialog<bool>(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text("错误提示"),
-                                      content: Text(error.response.toString()),
-                                      actions: <Widget>[
-                                        FlatButton(
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(true),
-                                            child: Text("确认"))
-                                      ],
-                                    );
-                                  });
-                            });
-
+                          try {
+                            for (String ruleId in _selectedToDelete) {
+                              print(ruleId);
+                              await MyHttp.delete(
+                                      '/rule-engine/rules/${ruleId.toString()}')
+                                  .catchError((error) {
+                                print(error);
+                                print(error.response);
+                                showDialog<bool>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text("错误提示"),
+                                        content:
+                                            Text(error.response.toString()),
+                                        actions: <Widget>[
+                                          FlatButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context)
+                                                      .pop(true),
+                                              child: Text("确认"))
+                                        ],
+                                      );
+                                    });
+                              });
+                            }
                             List<Map<String, dynamic>> data =
                                 await _getRuleList();
                             _streamController.sink.add(data);
 
                             _selectedToDelete.clear();
+                          } catch (err) {
+                            print(err);
                           }
                         },
                       ),
