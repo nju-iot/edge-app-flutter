@@ -46,6 +46,7 @@ dependencies:
   shared_preferences: ^0.5.12+4
   smooth_star_rating: ^1.1.1
   web_socket_channel: ^1.0.13
+
   # 日期选择器
   #flutter_cupertino_date_picker: ^1.0.26+2
 
@@ -56,6 +57,7 @@ dependencies:
 
 
 dev_dependencies:
+
   flutter_test:
     sdk: flutter
   build_runner:

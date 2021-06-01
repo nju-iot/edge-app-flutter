@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
-
 ///使用fluro进行路由管理
 class MyRouter {
   static FluroRouter router;
@@ -19,7 +18,6 @@ class MyRouter {
       print("route is not find !");
       return null;
     });
-
   }
 
   static void navigateTo(BuildContext context, String path) {
@@ -41,5 +39,10 @@ class MyRouter {
 
   static void replace(String routeName) {
     navigator.replace(routeName);
+  }
+
+  //实现返回后刷新
+  static void pushAndDo(String routeName, Function doSomething) {
+    navigator.push(routeName).then((value) => doSomething(value));
   }
 }

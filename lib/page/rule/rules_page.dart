@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app/page/rule/rules_list.dart';
+import 'package:flutter_app/page/rule/streams_list.dart';
 
 class RulesPage extends StatefulWidget{
   @override
@@ -7,12 +9,38 @@ class RulesPage extends StatefulWidget{
 
 }
 
-class _RulesPageState extends State<RulesPage>{
+class _RulesPageState extends State<RulesPage> with SingleTickerProviderStateMixin{
+
+  TabController _tabController;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _tabController=TabController(length: 2, vsync: this,initialIndex: 0);
+    _tabController.addListener(() { });
+    setState(() {
+
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("规则引擎"),
+        bottom: TabBar(
+          controller: _tabController,
+            indicatorColor: Colors.white,
+            tabs:<Widget>[
+              Tab(text: "流",),
+              Tab(text: "规则",),
+            ] ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: <Widget>[
+          StreamListPage(),
+          RuleListPage(),
+        ],
       ),
     );
   }
