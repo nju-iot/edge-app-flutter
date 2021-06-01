@@ -14,28 +14,52 @@ class _StreamsAddPageState extends State<StreamsAddPage> {
   final String defaultInput = 'create stream demo () WITH ( FORMAT = \"json\",'
       ' TYPE=\"edgex\")';
   String sql = "";
+
+  void _showLoadingDialog() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                CircularProgressIndicator(),
+                Padding(
+                  padding: const EdgeInsets.only(top: 26.0),
+                  child: Text("正在提交"),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
   void _formSubmit() {
-    _formKey.currentState.save();
     if (_formKey.currentState.validate()) {
-      MyHttp.postJson("/rule-engine/streams", {"sql": sql}).catchError((error) {
+      _formKey.currentState.save();
+      _showLoadingDialog();
+      MyHttp.postJson("/rule-engine/streams", {"sql": sql})
+          .then((value) => Navigator.of(context).pop())
+          .catchError((error) {
         print(error);
         return showDialog<bool>(
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text("错误提示"),
-                content: Text(error.response.toString()),
+                content:
+                    (error as DioError).type == DioErrorType.CONNECT_TIMEOUT
+                        ? Text("连接超时，请检查网络情况")
+                        : Text(error.response.toString()),
                 actions: <Widget>[
                   FlatButton(
                     child: Text("确认"),
-                    onPressed: () => Navigator.of(context).pop(true),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               );
-            });
-      }).then((value) {
-        print(value.toString());
-        Navigator.of(context).pop(true);
+            }).whenComplete(() => Navigator.of(context).pop());
       });
     }
   }

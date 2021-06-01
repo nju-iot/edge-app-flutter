@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 import "package:flutter_app/http.dart";
@@ -34,6 +35,26 @@ class _IntervalActionsAddPageState extends State<IntervalActionsAddPage> {
   TargetOptions _targetOptions;
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  void _showLoadingDialog() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                CircularProgressIndicator(),
+                Padding(
+                  padding: const EdgeInsets.only(top: 26.0),
+                  child: Text("正在提交"),
+                ),
+              ],
+            ),
+          );
+        });
+  }
 
   Widget _getTargetList() {
     return ClipRRect(
@@ -117,15 +138,36 @@ class _IntervalActionsAddPageState extends State<IntervalActionsAddPage> {
   }
 
   void _formSubmit() {
-    _formKey.currentState.save();
     if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+      _showLoadingDialog();
       print('验证通过');
       //TODO: 弹出加载动画
-      print(postData);
-      Scaffold.of(context).showSnackBar(SnackBar(
-        content: Text("Test"),
-      ));
-      //MyHttp.postJson('/support-scheduler/api/v1/intervalaction',)
+      print("表单: ${postData}");
+      MyHttp.postJson('/support-scheduler/api/v1/intervalaction', postData)
+          .then((value) {
+        print(value);
+      }).catchError((error) {
+        print(error);
+        print(error.response.toString());
+        MyHttp.handleError(error);
+        return showDialog<bool>(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("错误提示"),
+                content:
+                    (error as DioError).type == DioErrorType.CONNECT_TIMEOUT
+                        ? Text("连接超时，请检查网络状况或重试")
+                        : Text(error.response.toString()),
+                actions: [
+                  FlatButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text("确认")),
+                ],
+              );
+            }).whenComplete(() => Navigator.of(context).pop());
+      });
     } else {
       print('验证失败');
     }

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app/http.dart';
@@ -21,6 +22,26 @@ class _RulesAddPageState extends State<RulesAddPage> {
   GlobalKey<_ActionConfigWidgetState> _actionConfigStateKey =
       GlobalKey<_ActionConfigWidgetState>();
 
+  void _showLoadingDialog() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                CircularProgressIndicator(),
+                Padding(
+                  padding: const EdgeInsets.only(top: 26.0),
+                  child: Text("正在提交"),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
   void _addSubmit() {
     if (_sendTheResultToLogFile) {
       if (!(resultData['actions'] as List).contains({"log": {}})) {
@@ -29,6 +50,14 @@ class _RulesAddPageState extends State<RulesAddPage> {
     }
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
+      // 显示加载框
+      _showLoadingDialog();
+      //获取表单信息
+      List<Map<String, dynamic>> result =
+          _actionConfigStateKey.currentState.returnActionList();
+      (resultData['actions'] as List).addAll(result);
+
+      print("表单: ${resultData.toString()}");
       MyHttp.postJson('/rule-engine/rules', resultData).then((value) {
         Navigator.of(context).pop();
       }).catchError((error) {
@@ -38,7 +67,10 @@ class _RulesAddPageState extends State<RulesAddPage> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text("错误提示"),
-                content: Text(error.response.toString()),
+                content:
+                    (error as DioError).type == DioErrorType.CONNECT_TIMEOUT
+                        ? Text("连接超时，请检查网络情况")
+                        : Text(error.response.toString()),
                 actions: <Widget>[
                   FlatButton(
                     child: Text("确认"),
@@ -46,15 +78,9 @@ class _RulesAddPageState extends State<RulesAddPage> {
                   ),
                 ],
               );
-            });
+            }).whenComplete(() => Navigator.of(context).pop());
         FocusScope.of(context).requestFocus(new FocusNode());
       });
-      //获取表单信息
-      List<Map<String, dynamic>> result =
-          _actionConfigStateKey.currentState.returnActionList();
-      (resultData['actions'] as List).addAll(result);
-
-      print("表单: ${resultData.toString()}");
     }
 
     resultData = {"actions": []};
@@ -362,6 +388,7 @@ class _EdgeXMessageBusConfigWidgetState
               },
               controller: ent.entries.toList()[0].value,
               decoration: InputDecoration(
+                floatingLabelBehavior: FloatingLabelBehavior.always,
                 labelText: ent.entries.toList()[0].key,
               ),
             ),
@@ -377,6 +404,7 @@ class _EdgeXMessageBusConfigWidgetState
                 },
                 controller: ent.entries.toList()[1].value,
                 decoration: InputDecoration(
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
                   labelText: ent.entries.toList()[1].key,
                 ),
               ),
@@ -426,6 +454,7 @@ class _EdgeXMessageBusConfigWidgetState
                 },
                 controller: widget._optionalTextController,
                 decoration: InputDecoration(
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
                   labelText: "optional",
                 ),
               ),
@@ -505,6 +534,7 @@ class _MQTTConfigWidgetState extends State<MQTTConfigWidget> {
               },
               controller: ent.entries.toList()[0].value,
               decoration: InputDecoration(
+                floatingLabelBehavior: FloatingLabelBehavior.always,
                 labelText: ent.entries.toList()[0].key,
               ),
             ),
@@ -520,6 +550,7 @@ class _MQTTConfigWidgetState extends State<MQTTConfigWidget> {
                 },
                 controller: ent.entries.toList()[1].value,
                 decoration: InputDecoration(
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
                   labelText: ent.entries.toList()[1].key,
                 ),
               ),
@@ -617,6 +648,7 @@ class _MQTTConfigWidgetState extends State<MQTTConfigWidget> {
               child: TextFormField(
                 controller: widget._qosTextController,
                 decoration: InputDecoration(
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
                   labelText: "Qos",
                 ),
               ),
@@ -636,7 +668,8 @@ class RestHTTPConfigWidget extends StatefulWidget {
   TextEditingController _addressTextController = TextEditingController();
   TextEditingController _portTextController = TextEditingController();
   TextEditingController _pathTextController = TextEditingController();
-  TextEditingController _retryIntervalTextController = TextEditingController();
+  TextEditingController _retryIntervalTextController =
+      TextEditingController(text: "-1");
   bool sendSingle = true;
   TextEditingController _protocolTextController = TextEditingController();
   TextEditingController _parameterTextController = TextEditingController();
@@ -725,10 +758,11 @@ class _RestHTTPConfigWidgetState extends State<RestHTTPConfigWidget> {
                       if (snapshot.connectionState == ConnectionState.done) {
                         if (snapshot.hasError) {
                           print("Error: ${snapshot.error}");
+
                           return Container(
                             margin: EdgeInsets.only(top: 20),
                             child: Text(
-                              "请求发生错误，请重试",
+                              "请求发生错误，请刷新或是自定义配置",
                               style: TextStyle(
                                   color: Colors.red,
                                   fontSize: 16,
@@ -841,7 +875,22 @@ class _RestHTTPConfigWidgetState extends State<RestHTTPConfigWidget> {
                 Container(
                   width: MediaQuery.of(context).size.width * 0.35,
                   child: TextFormField(
+                    onSaved: (str) => resultConfig["rest"]["url"] =
+                        ((str.toLowerCase() == ""
+                                ? "http"
+                                : str.toLowerCase()) +
+                            "://" +
+                            widget._addressTextController.text +
+                            ":" +
+                            (widget._portTextController.text == ""
+                                ? "48082"
+                                : widget._portTextController.text) +
+                            (widget._pathTextController.text == ""
+                                ? '/'
+                                : widget._pathTextController.text)),
                     decoration: InputDecoration(
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      hintText: "HTTP",
                       labelText: "Protocol",
                     ),
                     controller: widget._protocolTextController,
@@ -853,6 +902,22 @@ class _RestHTTPConfigWidgetState extends State<RestHTTPConfigWidget> {
                         left: MediaQuery.of(context).size.width * 0.1),
                     width: MediaQuery.of(context).size.width * 0.35,
                     child: DropdownButtonFormField(
+                        onSaved: (value) {
+                          switch (widget.httpMethod) {
+                            case HTTPMethod.GET:
+                              resultConfig['rest']['method'] = "GET";
+                              break;
+                            case HTTPMethod.PUT:
+                              resultConfig['rest']['method'] = "PUT";
+                              break;
+                            case HTTPMethod.POST:
+                              resultConfig['rest']['method'] = "POST";
+                              break;
+                            case HTTPMethod.DELETE:
+                              resultConfig['rest']['method'] = "DELETE";
+                              break;
+                          }
+                        },
                         decoration: InputDecoration(
                           labelText: "Method",
                         ),
@@ -888,7 +953,10 @@ class _RestHTTPConfigWidgetState extends State<RestHTTPConfigWidget> {
                   Container(
                     width: MediaQuery.of(context).size.width * 0.35,
                     child: TextFormField(
+                      autovalidateMode: AutovalidateMode.always,
+                      validator: (str) => str == "" ? "本机地址不得为空" : null,
                       decoration: InputDecoration(
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
                         labelText: "Address",
                       ),
                       controller: widget._addressTextController,
@@ -901,6 +969,8 @@ class _RestHTTPConfigWidgetState extends State<RestHTTPConfigWidget> {
                       width: MediaQuery.of(context).size.width * 0.35,
                       child: TextFormField(
                         decoration: InputDecoration(
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                          hintText: "48082",
                           labelText: "Port",
                         ),
                         controller: widget._portTextController,
@@ -917,7 +987,11 @@ class _RestHTTPConfigWidgetState extends State<RestHTTPConfigWidget> {
                   Container(
                     width: MediaQuery.of(context).size.width * 0.35,
                     child: TextFormField(
-                      decoration: InputDecoration(labelText: "RetryInterval"),
+                      onSaved: (str) =>
+                          resultConfig['rest']['retryInterval'] = str,
+                      decoration: InputDecoration(
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                          labelText: "RetryInterval"),
                       controller: widget._retryIntervalTextController,
                     ),
                   ),
@@ -927,6 +1001,8 @@ class _RestHTTPConfigWidgetState extends State<RestHTTPConfigWidget> {
                             left: MediaQuery.of(context).size.width * 0.1),
                         width: MediaQuery.of(context).size.width * 0.35,
                         child: DropdownButtonFormField(
+                            onSaved: (value) =>
+                                resultConfig['rest']['sendSingle'] = value,
                             decoration: InputDecoration(
                               labelText: "SendSingle",
                             ),
@@ -949,6 +1025,8 @@ class _RestHTTPConfigWidgetState extends State<RestHTTPConfigWidget> {
               Container(
                 child: TextFormField(
                   decoration: InputDecoration(
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    hintText: "/",
                     labelText: "Path",
                   ),
                   controller: widget._pathTextController,
@@ -956,8 +1034,22 @@ class _RestHTTPConfigWidgetState extends State<RestHTTPConfigWidget> {
               ),
               if (widget.httpMethod != HTTPMethod.GET)
                 Container(
+                  margin: EdgeInsets.only(top: 20),
                   child: TextFormField(
-                    decoration: InputDecoration(labelText: "Parameter"),
+                    onSaved: (str) =>
+                        resultConfig['rest']['dataTemplate'] = str,
+                    decoration: InputDecoration(
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Parameter",
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.blueAccent),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.blue),
+                      ),
+                    ),
                     maxLines: null,
                     controller: widget._parameterTextController,
                   ),

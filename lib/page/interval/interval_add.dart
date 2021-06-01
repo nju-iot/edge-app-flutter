@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -107,7 +108,10 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: Text('错误提示'),
-                  content: Text('添加失败，请检查网络状况或重试'),
+                  content:
+                      (error as DioError).type == DioErrorType.CONNECT_TIMEOUT
+                          ? Text('连接超时，请检查网络状况或重试')
+                          : Text(error.response.toString()),
                   actions: <Widget>[
                     FlatButton(
                       child: Text('确认'),
@@ -117,7 +121,9 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
                     ),
                   ],
                 );
-              });
+              }).whenComplete(() {
+            Navigator.of(context).pop(true);
+          });
         });
       } else {
         _postData["id"] = _myInterval.id;
@@ -136,15 +142,19 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
                     FlatButton(
                       child: Text('确认'),
                       onPressed: () {
+                        //退出提示框
                         Navigator.of(context).pop(true);
                       },
                     ),
                   ],
                 );
-              });
+              }).whenComplete(() {
+            //退出加载框
+            Navigator.of(context).pop(true);
+          });
         });
       }
-      Navigator.of(context).pop();
+      //Navigator.of(context).pop();
     } else {
       print("验证失败");
     }
