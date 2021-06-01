@@ -339,9 +339,18 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
 
   @override
   Widget build(BuildContext context) {
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
     return Scaffold(
       appBar: AppBar(
         title: Text(this.interval == "" ? "新增定时任务" : "修改定时任务"),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              appBarColor[800],
+              appBarColor[200],
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          ),
+        ),
       ),
       floatingActionButton: new FloatingActionButton(
         onPressed: _formSubmit,

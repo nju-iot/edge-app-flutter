@@ -88,9 +88,19 @@ class _RulesAddPageState extends State<RulesAddPage> {
 
   @override
   Widget build(BuildContext context) {
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
+
     return Scaffold(
       appBar: AppBar(
         title: Text("新增规则"),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              appBarColor[800],
+              appBarColor[200],
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

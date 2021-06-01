@@ -22,9 +22,19 @@ class _RuleInfoPageState extends State<RuleInfoPage> {
 
   @override
   Widget build(BuildContext context) {
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
+
     return Scaffold(
       appBar: AppBar(
         title: Text("规则信息"),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              appBarColor[800],
+              appBarColor[200],
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          ),
+        ),
       ),
       body: FutureBuilder(
           future: _getRuleInfo(),

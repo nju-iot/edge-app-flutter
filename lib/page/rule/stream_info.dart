@@ -17,9 +17,18 @@ class StreamInfoPage extends StatefulWidget {
 class _StreamInfoPageState extends State<StreamInfoPage> {
   @override
   Widget build(BuildContext context) {
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
     return Scaffold(
       appBar: AppBar(
         title: Text("数据流信息"),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              appBarColor[800],
+              appBarColor[200],
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          ),
+        ),
       ),
       body: FutureBuilder(
         future: MyHttp.get("/rule-engine/streams/${widget.name}"),
