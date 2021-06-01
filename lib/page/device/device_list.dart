@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/http.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'dart:math' as math;
 
 var tmp;//请求到的所有数据
+bool searched = false;//标记是否进行筛选操作
 
 class DeviceListPage extends StatefulWidget{
   @override
@@ -17,26 +19,37 @@ class DeviceListPage extends StatefulWidget{
 
 class DeviceListPageState extends State<DeviceListPage>{
 
-
   @override
   void initState(){
     super.initState();
     setState(() {
+      searched = false;
     });
   }
-  var items = [];//展示结果
+
+  var items = [];//展示搜索结果
   List<dynamic> showTmp = [];//从服务器上请求到的数据，用户可能会对其进行筛选，这是实际上要展示的数据。
-  bool searched = false;//标记是否进行筛选操作
+  List<dynamic> tmpByPage = [];//分页展示的每页数据
+  int currentPage = 1;
+
 
   @override
   Widget build(BuildContext context){
 
-    //final GlobalKey<ScaffoldState> _ScaffoldKey = GlobalKey();
+    final GlobalKey<ScaffoldState> _ScaffoldKey = GlobalKey();
     //_ScaffoldKey.currentState.openEndDrawer();
     Future<Null> _onrefresh(){
       return Future.delayed(Duration(seconds: 5),(){   // 延迟5s完成刷新
         setState(() {
           searched = false;//重置筛选状态
+          Fluttertoast.showToast(
+              msg: "刷新成功",
+              gravity: ToastGravity.SNACKBAR,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
         });
       });
     }
@@ -45,6 +58,7 @@ class DeviceListPageState extends State<DeviceListPage>{
 
     return RefreshIndicator(
         child: Scaffold(
+          backgroundColor: Colors.grey[50],
           endDrawer: MyEndDrawer(),
           floatingActionButton:Draggable(
             child:FloatingActionButton(
@@ -62,16 +76,26 @@ class DeviceListPageState extends State<DeviceListPage>{
             onDragEnd: (detail){
             },
           ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
           body:FutureBuilder(
             future:MyHttp.get('/core-metadata/api/v1/device'),
             builder: (BuildContext context,AsyncSnapshot snapshot){
               if(snapshot.hasData){
+                tmpByPage.clear();
                 tmp = snapshot.data;
                 if(searched==false){//不进行筛选则展示所有结果
                   showTmp.clear();
                   for(int i=0;i<tmp.length;i++){
-                    showTmp.add(tmp[i]);
+                    showTmp.add(tmp[i]);//把tmp的每项都赋给showTmp
                   }
+                  /*for(int i=currentPage*6-6;i<currentPage*6;i++){
+                    if(i==tmp.length)break;
+                    showTmp.add(tmp[i]);
+                  }*/
+                }
+                for(int i=currentPage*6-6;i<currentPage*6;i++){
+                  if(i==showTmp.length)break;
+                  tmpByPage.add(showTmp[i]);
                 }
                return FloatingSearchBar(
                    automaticallyImplyDrawerHamburger: false,
@@ -148,7 +172,7 @@ class DeviceListPageState extends State<DeviceListPage>{
                                      onTap:(){},
                                      title:Text("${items[index]['name'].toString()}"),
                                      trailing:IconButton(
-                                         icon:Icon(Icons.arrow_forward_ios),
+                                         icon:Icon(Icons.drive_file_rename_outline),
                                          onPressed:(){
                                            MyRouter.push(Routes.deviceInfoPage(name:"${items[index]['name'].toString()}"));
                                          }
@@ -161,27 +185,58 @@ class DeviceListPageState extends State<DeviceListPage>{
                      );
                    },
                    body:IndexedStack(
-                     children: [
+                     children: <Widget>[
                        Column(
                          children:<Widget>[
+                           Container(
+                             margin:const EdgeInsets.only(top:60.0),
+                           ),
+                           Row(
+                             mainAxisAlignment: MainAxisAlignment.center,
+                             children: <Widget>[
+
+                               IconButton(icon: Icon(Icons.arrow_left,color:currentPage>1?Theme.of(context).primaryColor:Colors.grey), onPressed: (){
+                                 if(currentPage>1){
+                                   currentPage-=1;
+                                   setState(() {
+
+                                   });
+                                 }
+                               }),
+                               Text("上一页"),
+                               SizedBox(width:20),
+                               Text("第${currentPage}/${(showTmp.length%6==0?showTmp.length/6:showTmp.length/6+1).toInt()}页"),
+                               SizedBox(width:20),
+                               Text("下一页"),
+                               IconButton(icon: Icon(Icons.arrow_right,color:currentPage<showTmp.length/6?Theme.of(context).primaryColor:Colors.grey), onPressed: (){
+                                 if(currentPage<showTmp.length/6){
+                                   currentPage+=1;
+                                   setState(() {
+
+                                   });
+                                 }
+                               }),
+                             ],
+                           ),
                            Expanded(
                              child:Container(
-                               margin:const EdgeInsets.only(top:70.0),
+                               //margin:const EdgeInsets.only(top:70.0),
                                child:ListView.builder(
-                                 itemCount: showTmp == null? 0 : showTmp.length,
+                                 itemCount: tmpByPage == null? 0 : tmpByPage.length,
                                  itemBuilder: (BuildContext context, int index){
                                    return InkWell(
                                      onTap: (){},
                                      child:Card(
                                        child:ListTile(
                                          onTap:(){},
-                                         leading:Text("${index+1}"),
-                                         title:Text("${showTmp[index]['name'].toString()}",style:TextStyle(fontWeight: FontWeight.bold)),
-                                         subtitle: Text("id: ${showTmp[index]['id'].toString()}"),
+                                         leading:Text("${currentPage*6-6+index+1}"),
+                                         visualDensity: VisualDensity(horizontal: -4),
+                                         title:Text("${tmpByPage[index]['name'].toString()}",style:TextStyle(fontWeight: FontWeight.bold),maxLines: 2,overflow: TextOverflow.ellipsis),
+                                         subtitle: Text("id: ${tmpByPage[index]['id'].toString()}",maxLines: 2,overflow: TextOverflow.ellipsis),
                                          trailing:IconButton(
-                                             icon:Icon(Icons.arrow_forward_ios),
+                                             icon:Icon(Icons.drive_file_rename_outline),
                                              onPressed:(){
-                                               MyRouter.push(Routes.deviceInfoPage(name:"${showTmp[index]['name'].toString()}"));
+                                               MyRouter.push(Routes.deviceInfoPage(name:"${tmpByPage[index]['name'].toString()}"));
                                              }
                                          ),
                                        ),
@@ -228,9 +283,9 @@ class DeviceListPageState extends State<DeviceListPage>{
                       10),
                   decoration: BoxDecoration(color: Theme.of(context).primaryColor),
                   child: Text(
-                    '筛选',
+                    '筛选菜单',
                     style: TextStyle(
-                        color: Colors.black87, fontWeight: FontWeight.bold),
+                        color: Colors.black, fontWeight: FontWeight.bold,fontSize: 16),
                   ),
                 ),
                 Expanded(
@@ -243,10 +298,10 @@ class DeviceListPageState extends State<DeviceListPage>{
                           children: [
                             Container(
                               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: Text('排序方式'),
+                              child: Text('排序方式',style:TextStyle(fontWeight: FontWeight.bold)),
                             ),
                             Wrap(
-                              spacing: 2, //主轴上子控件的间距
+                              spacing: 5, //主轴上子控件的间距
                               runSpacing: 5, //交叉轴上子控件之间的间距
                               children: [
                                 DropdownButton<String>(
@@ -283,28 +338,28 @@ class DeviceListPageState extends State<DeviceListPage>{
                             ),
                             Container(
                               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: Text('管理状态'),
+                              child: Text('是否锁定',style:TextStyle(fontWeight: FontWeight.bold)),
                             ),
                             Wrap(
-                              spacing: 2,
+                              spacing: 5,
                               runSpacing: 5,
                               children: FilterItems(adminFilters,adminSelects),
                             ),
                             Container(
                               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: Text('操作状态'),
+                              child: Text('状态',style:TextStyle(fontWeight: FontWeight.bold)),
                             ),
                             Wrap(
-                              spacing: 2,
+                              spacing: 5,
                               runSpacing: 5,
                               children: FilterItems(operateFilters,operateSelects),
                             ),
                             Container(
                               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: Text('协议类型'),
+                              child: Text('协议类型',style:TextStyle(fontWeight: FontWeight.bold)),
                             ),
                             Wrap(
-                              spacing: 2,
+                              spacing: 5,
                               runSpacing: 5,
                               children: FilterItems(protocolFilters,protocolSelects),
                             ),
@@ -367,10 +422,10 @@ class DeviceListPageState extends State<DeviceListPage>{
       var item = filters[index];
       return InkWell(
         child: Container(
-          padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+          padding: EdgeInsets.all(5),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.black54, width: 1.0),
+              border: Border.all(color: Colors.black, width: 1.0),
               color: item.isCheck ? Theme.of(context).primaryColor : Colors.grey.shade300),
           child: Padding(
             padding: EdgeInsets.fromLTRB(10, 2, 10, 2),

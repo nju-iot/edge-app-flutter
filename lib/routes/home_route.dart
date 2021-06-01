@@ -10,6 +10,7 @@ import 'package:flutter_app/utils/provider.dart';
 import 'package:flutter_app/widget/grid_item.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeRoute extends StatefulWidget{
   @override
@@ -18,7 +19,6 @@ class HomeRoute extends StatefulWidget{
 
 ///主界面,暂时先这样
 class _HomeRouteState extends State<HomeRoute>{
-
   String dropDownValue = '服务器1';
 
   @override
@@ -31,26 +31,51 @@ class _HomeRouteState extends State<HomeRoute>{
       });
     }
     return RefreshIndicator(
-        child: _buildBody(),
+        child: _buildBody(context),
         onRefresh: _onrefresh,
     );
   }
 
-  Widget _buildBody(){
+  Widget _buildBody(BuildContext context){
+    MaterialColor buttonColor = Theme.of(context).primaryColor;
+    final List<FunctionPageItem> funcs = [
+      FunctionPageItem("设备服务", Colors.grey[200], Icon(Icons.devices,size:36,color:buttonColor[300]), Routes.devicePage),
+      FunctionPageItem("消息管理", Colors.grey[200], Icon(Icons.mail_outline,size:36,color:buttonColor[300]), Routes.noticePage),
+      FunctionPageItem("定时任务", Colors.grey[200], Icon(Icons.timer_outlined,size:36,color:buttonColor[300]), Routes.intervalPage),
+      FunctionPageItem("规则引擎", Colors.grey[200], Icon(Icons.rule,size:36,color:buttonColor[300]), Routes.rulesPage),
+    ];
 
-    return Column(
+    return Container(
+      color:Colors.white,
+      child:Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children:<Widget>[
 
         //先写死，实际上应该是有多台edgeX服务器的
         Container(
             width:double.infinity,
-            color:Colors.white,
             padding:EdgeInsets.fromLTRB(8, 8, 8, 0),
             child:Card(
                 color:Colors.lightBlueAccent,
                 child:Container(
                   padding:EdgeInsets.all(10.0),
+                  decoration:BoxDecoration(
+                      image: new DecorationImage(
+                        fit: BoxFit.cover,
+                        colorFilter: ColorFilter.mode(buttonColor[100], BlendMode.modulate),
+                        image: new AssetImage(
+                            'android/app/src/main/res/drawable/bg4.jpg'),
+                      ),
+                      borderRadius: BorderRadius.circular(5.0),
+                      gradient:LinearGradient(
+                        begin: Alignment(0.0, -1.0),
+                        end: Alignment(0.0, 1.0),
+                        colors: <Color>[
+                          Colors.lightBlueAccent,
+                          Colors.lightBlueAccent[100],
+                        ],
+                      )
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                       children:<Widget>[
@@ -89,11 +114,27 @@ class _HomeRouteState extends State<HomeRoute>{
         //简单的数据监控，展示一部分数据，先写死
         Container(
           width:double.infinity,
-          color:Colors.white,
           padding:EdgeInsets.all(8.0),
           child:Card(
             color:Colors.lightBlueAccent,
             child:Container(
+              decoration:BoxDecoration(
+                  image: new DecorationImage(
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(buttonColor[200], BlendMode.modulate),
+                    image: new AssetImage(
+                        'android/app/src/main/res/drawable/bg3.jpg'),
+                  ),
+                borderRadius: BorderRadius.circular(5.0),
+                gradient:LinearGradient(
+                  begin: Alignment(0.0, -1.0),
+                  end: Alignment(0.0, 1.0),
+                  colors: <Color>[
+                    Colors.lightBlueAccent[400],
+                    Colors.lightBlueAccent[100],
+                  ],
+                )
+              ),
               padding:EdgeInsets.all(10.0),
               child: Column(
                 children:<Widget>[
@@ -133,8 +174,18 @@ class _HomeRouteState extends State<HomeRoute>{
                             child:Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children:<Widget>[
-                                Text("0",style:TextStyle(fontSize: 24,color: Colors.white70)),
-                                Text("告警中", style:TextStyle(color: Colors.white70)),
+                                FutureBuilder(
+                                  future:MyHttp.get('/core-metadata/api/v1/deviceservice'),
+                                  builder:(BuildContext context,AsyncSnapshot snapshot){
+                                    if(snapshot.hasData){
+                                    var tmp = snapshot.data;
+                                    return Text("${tmp.length}",style:TextStyle(fontSize: 24,color: Colors.white70));
+                                  }else{
+                                    return Text("0",style:TextStyle(fontSize: 24,color: Colors.white70));
+                                    }
+                                  }
+                                ),
+                                Text("设备服务", style:TextStyle(color: Colors.white70)),
                               ]
                             )
                           ),
@@ -160,70 +211,67 @@ class _HomeRouteState extends State<HomeRoute>{
           )
         ),
 
-        //以下为服务菜单
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0, left: 18, right: 16),
-          child: Text(
-            "边缘服务",
-            textAlign: TextAlign.left,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-              letterSpacing: 0.27,
-              color: Colors.black54,
-            ),
-          ),
-        ),
-
-        Expanded(
-          child:Container(
-              width:double.infinity,
-              //height:
-              //color:Colors.white,
-              padding:EdgeInsets.all(12.0),
-              child:GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 10.0,
-                  crossAxisSpacing: 10.0,
-                  childAspectRatio: 1.6,
+        Container(
+          child:Column(
+            children: <Widget>[
+              //以下为服务菜单
+              Container(
+                width:double.infinity,
+                padding: const EdgeInsets.only(top: 8.0, left: 18, right: 16),
+                child: Text(
+                  "边缘服务",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    letterSpacing: 0.27,
+                    color: Colors.black54,
+                  ),
                 ),
-                itemBuilder: (context,index){
-                  //onTap:(){}
-                  var func = funcs[index];
-                  return GridItem(
-                    title:func.title,
-                    color: func.color,
-                    icon:func.icon,
-                    //aimPage: func.page,
-                    onTap:(){
-                      MyRouter.push(func.page);
+              ),
+
+              Container(
+
+                  width:double.infinity,
+                  //height:
+                  padding:EdgeInsets.only(top:12.0,left:12.0,right:12.0,bottom:12.0),
+                  child:GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 10.0,
+                      crossAxisSpacing: 10.0,
+                      childAspectRatio: 1.6,
+                    ),
+                    itemBuilder: (context,index){
+                      //onTap:(){}
+                      var func = funcs[index];
+                      return GridItem(
+                        title:func.title,
+                        color: func.color,
+                        icon:func.icon,
+                        //aimPage: func.page,
+                        onTap:(){
+                          MyRouter.push(func.page);
+                        },
+                      );
                     },
-                  );
-                },
-                shrinkWrap: true,
-                itemCount: funcs.length,
-              )
-          ),
+                    shrinkWrap: true,
+                    itemCount: funcs.length,
+                  )
+              ),
+            ],
+          )
         ),
 
       ]
       /*child:RaisedButton(
         child:Text("登录"),
       ),*/
+      )
     );
   }
 
-  final List<FunctionPageItem> funcs = [
-    FunctionPageItem("设备服务", Colors.grey[200], Icon(Icons.devices,size:36), Routes.devicePage),
-    FunctionPageItem("提醒消息", Colors.grey[200], Icon(Icons.mail_outline,size:36), Routes.noticePage),
-    FunctionPageItem("定时任务", Colors.grey[200], Icon(Icons.timer_outlined,size:36), Routes.intervalPage),
-    FunctionPageItem("规则引擎", Colors.grey[200], Icon(Icons.rule,size:36), Routes.rulesPage),
-  ];
-
-
 }
-
 
 ///主界面的drawer
 class MyDrawer extends StatelessWidget{
@@ -231,12 +279,10 @@ class MyDrawer extends StatelessWidget{
     Key key,
 }):super(key:key);
 
-
-
   @override
   Widget build(BuildContext context){
-    return Consumer<AppStatus>(
-      builder:(BuildContext context, AppStatus status,Widget child){
+    return Consumer2<UserProfile,AppStatus>(
+      builder:(BuildContext context, UserProfile profile,AppStatus status,Widget child){
         return Drawer(
           child:SingleChildScrollView(
             child:MediaQuery.removePadding(
@@ -245,8 +291,8 @@ class MyDrawer extends StatelessWidget{
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children:<Widget>[
-                  _buildHeader(context),
-                  _buildMenus(context,status),
+                  _buildHeader(context,profile),
+                  _buildMenus(context,status,profile),
                   //Expanded(child:_buildMenus(context,status)),
                 ],
               ),
@@ -257,30 +303,42 @@ class MyDrawer extends StatelessWidget{
     );
   }
 
-  Widget _buildHeader(BuildContext context){
+  Widget _buildHeader(BuildContext context,UserProfile profile){
       return GestureDetector(
         child:Container(
-          color: Theme.of(context).primaryColor,
-          padding: EdgeInsets.only(top: 40, bottom: 20),
-          child:Row(
-            children:<Widget>[
-              Padding(
-                padding:const EdgeInsets.symmetric(horizontal: 16.0),
-                child:ClipOval(
-                  child:Image.asset("android/app/src/main/res/drawable/amiya.jpg",//只是试一下添加图片，随便找的图
-                    width:80,
-                    height:80,
+          decoration: BoxDecoration(
+            image: new DecorationImage(
+              fit: BoxFit.cover,
+              image: new AssetImage(
+                  'android/app/src/main/res/drawable/background2.jpg'),
+            ),
+          ),
+          //color: Theme.of(context).primaryColor,
+          child:Container(
+            color:Colors.white.withOpacity(.3),
+            padding: EdgeInsets.only(top: 40, bottom: 20),
+            child:Row(
+              children:<Widget>[
+                Padding(
+                  padding:const EdgeInsets.symmetric(horizontal: 16.0),
+                  child:ClipOval(
+                    child:Image.asset("android/app/src/main/res/drawable/amiya.jpg",//只是试一下添加图片，随便找的图
+                      width:80,
+                      height:80,
+                    ),
                   ),
                 ),
-              ),
-              Text(
-                "登录（假的）",
-                style:TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color:Colors.white,
-                ),
-              )
-            ],
+                Text(
+                  profile.userName!=null?profile.userName:"未登录",
+                  overflow: TextOverflow.ellipsis,
+                  style:TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    color:Colors.black54,
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       );
@@ -288,7 +346,7 @@ class MyDrawer extends StatelessWidget{
   }
 
   //左侧抽屉菜单
-  Widget _buildMenus(BuildContext context,AppStatus status){
+  Widget _buildMenus(BuildContext context,AppStatus status,UserProfile profile){
 
     return ListView(
       shrinkWrap: true, //为true可以解决子控件必须设置高度的问题
@@ -334,8 +392,11 @@ class MyDrawer extends StatelessWidget{
         Divider(height: 1.0, color: Colors.grey),
         ListTile(
           leading: const Icon(Icons.logout),
-          title:Text("登出(假的)"),
-          onTap:() {},
+          title:Text("登出"),
+          onTap:() {
+            profile.userName = null;
+            MyRouter.replace(Routes.loginPage);
+          },
         )
       ],
     );

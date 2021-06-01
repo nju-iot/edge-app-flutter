@@ -2,6 +2,8 @@
 import 'package:auto_route/auto_route_annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/http.dart';
+import 'package:flutter_app/widget/icon_with_text.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 var tmp;
 class SubInfoPage extends StatefulWidget{
@@ -26,12 +28,13 @@ class _SubInfoPageState extends State<SubInfoPage>{
 
   @override
   Widget build(BuildContext context) {
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
     GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     void _forSubmitted(){
       var _form = formKey.currentState;
       if(_form.validate()){
-        postTmp['subscribedLabels'] = tmp['subscribedLabels'];
+        //postTmp['subscribedLabels'] = tmp['subscribedLabels'];
         MyHttp.putJson('/support-notification/api/v1/subscription',postTmp).catchError((error){
           MyHttp.handleError(error);
           return showDialog<bool>(
@@ -51,15 +54,34 @@ class _SubInfoPageState extends State<SubInfoPage>{
                 );
               }
           );
+        }).then((value) {
+          _form.save();
+          Navigator.of(context).pop(true);
+          setState(() {
+            Fluttertoast.showToast(
+                msg: "修改成功",
+                gravity: ToastGravity.CENTER,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                textColor: Colors.white,
+                fontSize: 16.0
+            );
+          });
         });
-        _form.save();
-        Navigator.of(context).pop(true);
       }
     }
 
     return Scaffold(
       appBar:AppBar(
         title:Text("详情"),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              appBarColor[800],
+              appBarColor[200],
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.delete),
@@ -80,9 +102,20 @@ class _SubInfoPageState extends State<SubInfoPage>{
                         FlatButton(
                           child: Text('确认'),
                           onPressed: () {
-                            MyHttp.delete('/support-notification/api/v1/subscription/${widget.id}');
-                            Navigator.of(context).pop(true);
-                            Navigator.of(context).pop(true);
+                            MyHttp.delete('/support-notification/api/v1/subscription/${widget.id}').then((value){
+                              Navigator.of(context).pop(true);
+                              Navigator.of(context).pop(true);
+                              setState(() {
+                                Fluttertoast.showToast(
+                                    msg: "删除成功",
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                    textColor: Colors.white,
+                                    fontSize: 16.0
+                                );
+                              });
+                            });
                           },
                         ),
                       ],
@@ -107,8 +140,8 @@ class _SubInfoPageState extends State<SubInfoPage>{
               'id':tmp['id'],
               'receiver':tmp['receiver'],
               'description':tmp['description'],
-              'subscribedLabels':tmp['subscribedLabels'],
-              'subscribedCategories':tmp['subscribedCategories'],
+              'subscribedLabels':tmp['subscribedLabels']==null?[]:tmp['subscribedLabels'],
+              'subscribedCategories':tmp['subscribedCategories']==null?[]:tmp['subscribedCategories'],
               'channels':tmp['channels'],
             };
             var subLabels = tmp['subscribedLabels']==null?'无':tmp['subscribedLabels'].toString().substring(1,tmp['subscribedLabels'].toString().length-1);
@@ -134,6 +167,7 @@ class _SubInfoPageState extends State<SubInfoPage>{
                                     //contentPadding: EdgeInsets.all(10.0),
                                     labelText: "id",
                                     labelStyle: TextStyle(color:Colors.black),
+                                    icon:Icon(Icons.perm_identity)
                                   ),
                                   style: TextStyle(color:Colors.grey),
                                   initialValue: tmp['id'],
@@ -144,6 +178,7 @@ class _SubInfoPageState extends State<SubInfoPage>{
                                     //contentPadding: EdgeInsets.all(10.0),
                                     labelText: "slug",
                                     labelStyle: TextStyle(color:Colors.black),
+                                    icon:Icon(Icons.perm_device_info)
                                   ),
                                   style: TextStyle(color:Colors.grey),
                                   initialValue: tmp['slug'],
@@ -154,6 +189,7 @@ class _SubInfoPageState extends State<SubInfoPage>{
                                     //contentPadding: EdgeInsets.all(10.0),
                                     labelText: "接收方",
                                     labelStyle: TextStyle(color:Colors.black),
+                                    icon:Icon(Icons.devices)
                                   ),
                                   style: TextStyle(color:Colors.grey),
                                   initialValue: tmp['receiver']==null?'无':tmp['receiver'],
@@ -163,18 +199,27 @@ class _SubInfoPageState extends State<SubInfoPage>{
                                   decoration:InputDecoration(
                                     labelText: "描述信息",
                                     labelStyle: TextStyle(color:Colors.black,fontSize: 14),
+                                    icon:Icon(Icons.description_outlined)
                                   ),
                                   initialValue: tmp['description'],
                                   onChanged: (val){
                                     postTmp['description'] = val;
                                   },
                                 ),
-                                SizedBox(height:10),
-                                Text("订阅类别",style:TextStyle(color:Colors.black,fontSize: 14)),
-                                MySubCategories(tmp, subCata),
+                                SizedBox(height:30),
 
-                                Text("订阅标签",style:TextStyle(color:Colors.black,fontSize: 14)),
-                                MySubLabel(tmp,subLabels),
+                                Container(
+                                  padding: EdgeInsets.only(left:40.0),
+                                  child:Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children:<Widget>[
+                                      IconText(" 订阅类别",icon:Icon(Icons.category),style:TextStyle(color:Colors.black,fontSize: 14)),
+                                      MySubCategories(postTmp, subCata),
+                                      IconText(" 订阅标签",icon:Icon(Icons.label),style:TextStyle(color:Colors.black,fontSize: 14)),
+                                      MySubLabel(postTmp,subLabels),
+                                    ]
+                                  )
+                                )
                               ]
                           )
                         )

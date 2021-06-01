@@ -5,12 +5,13 @@ import 'package:flutter_app/http.dart';
 import 'package:flutter_app/page/device/device_add.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
+import 'package:flutter_app/widget/icon_with_text.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 var tmp;
 class DeviceInfoPage extends StatefulWidget{
   final String name;
-  
   //DeviceInfoPage({Key key,@PathParam('name') this.name}):super(key:key);
   DeviceInfoPage({@PathParam('name') this.name});
 
@@ -19,7 +20,8 @@ class DeviceInfoPage extends StatefulWidget{
 }
 
 class _DeviceInfoPageState extends State<DeviceInfoPage>{
-
+  // 响应空白处的焦点的Node
+  FocusNode blankNode = FocusNode();
   //var tmp;
   Map<String,dynamic> postTmp;
   Map<String,dynamic> allProtocols = {
@@ -61,13 +63,16 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
     _future = MyHttp.get('/core-metadata/api/v1/device/name/${widget.name}');
     //_futureOfServices = MyHttp.get('http://47.102.192.194:48081/api/v1/deviceservice');
     //_futureOfProfiles = MyHttp.get('http://47.102.192.194:48081/api/v1/deviceprofile');
-
     super.initState();
+  }
+
+  void closeKeyboard(BuildContext context) {
+    FocusScope.of(context).requestFocus(blankNode);
   }
 
   @override
   Widget build(BuildContext context){
-
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
     GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     void _forSubmitted(){
@@ -98,15 +103,31 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
                 );
               }
           );
+        }).then((value) {
+          Fluttertoast.showToast(
+              msg: "修改成功",
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
         });
         _form.save();
         Navigator.of(context).pop(true);
       }
     }
-
     return Scaffold(
       appBar:AppBar(
         title:Text("设备详情"),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              appBarColor[800],
+              appBarColor[200],
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          ),
+        ),
         actions: [
           IconButton(
               icon: Icon(Icons.delete),
@@ -127,9 +148,21 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
                           FlatButton(
                             child: Text('确认'),
                             onPressed: () {
-                              MyHttp.delete('/core-metadata/api/v1/device/name/${widget.name}');
-                              Navigator.of(context).pop(true);
-                              Navigator.of(context).pop(true);
+                              MyHttp.delete('/core-metadata/api/v1/device/name/${widget.name}').then((value){
+                                Navigator.of(context).pop(true);
+                                Navigator.of(context).pop(true);
+                                setState(() {
+                                  MyRouter.replace(Routes.devicePage);
+                                  Fluttertoast.showToast(
+                                      msg: "删除成功",
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: appBarColor.withOpacity(.5),
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
+                                });
+                              });
                             },
                           ),
                         ],
@@ -144,8 +177,13 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
         onPressed: _forSubmitted,
         child: new Text('提交'),
       ),
-        body:FutureBuilder(
-            future:_future,
+
+      body:GestureDetector(
+        onTap:(){
+        //closeKeyboard(context);
+        },
+        child:FutureBuilder(
+            future:MyHttp.get('/core-metadata/api/v1/device/name/${widget.name}'),//_future,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.hasData) {
                 tmp = snapshot.data;
@@ -176,6 +214,10 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children:<Widget>[
                           Container(
+                              /*decoration:BoxDecoration(
+                                border: Border.all(color:Theme.of(context).primaryColor,width:2.0),
+                                borderRadius: BorderRadius.all(Radius.circular(20.0))
+                              ),*/
                               padding:EdgeInsets.all(16.0),
                               child:Form(
                                 key:formKey,
@@ -183,42 +225,55 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
                                 child:Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children:<Widget>[
-                                      Text("基本信息",style:TextStyle(color:Colors.green,fontWeight: FontWeight.bold,fontSize: 16)),
+                                      //Text("基本信息",style:TextStyle(color:Colors.green,fontWeight: FontWeight.bold,fontSize: 16)),
+                                      Container(
+                                        margin: EdgeInsets.only(left: 40.0),
+                                        child:Text("基本信息",style:TextStyle(color:Colors.green,fontWeight: FontWeight.bold,fontSize: 16)),
+                                      ),
                                       SizedBox(height:10),
                                       TextFormField(
                                         decoration:InputDecoration(
                                           //contentPadding: EdgeInsets.all(10.0),
                                           labelText: "设备名称",
-                                          labelStyle: TextStyle(color:Colors.black),
+                                          icon:Icon(Icons.device_unknown)
                                         ),
                                         style: TextStyle(color:Colors.grey),
                                         initialValue: tmp['name'],
                                         enabled: false,
                                       ),
+                                      SizedBox(height:20),
                                       TextFormField(
                                         decoration:InputDecoration(
                                           //contentPadding: EdgeInsets.all(10.0),
                                           labelText:"设备id",
-                                          labelStyle: TextStyle(color:Colors.black),
+                                          icon:Icon(Icons.devices)
                                         ),
-                                        style: TextStyle(color:Colors.grey),
+                                        style: TextStyle(color:Colors.grey,fontSize: 14.0),
                                         initialValue: tmp['id'],
                                         enabled:false,
                                       ),
+                                      SizedBox(height:20),
                                       TextFormField(
                                         decoration:InputDecoration(
                                           labelText: "设备描述",
-                                          labelStyle: TextStyle(color:Colors.black,fontSize: 14),
+                                          //labelStyle: TextStyle(color:Colors.black),
+                                          hintText: "对设备的简要描述，可选",
+                                          hintStyle: TextStyle(fontSize: 12),
+                                          icon:Icon(Icons.description_outlined),
                                         ),
                                         initialValue: tmp['description'],
                                         onChanged: (val){
                                           postTmp['description'] = val;
                                         },
                                       ),
+                                      SizedBox(height:20),
                                       TextFormField(
                                           decoration:InputDecoration(
                                             labelText: "设备标签",
-                                            labelStyle: TextStyle(color:Colors.black,fontSize: 14),
+                                            //labelStyle: TextStyle(color:Colors.black),
+                                            hintStyle: TextStyle(fontSize: 12),
+                                            hintText: "设备的标签，可选，标签间以英文逗号分隔",
+                                            icon:Icon(Icons.label),
                                           ),
                                           initialValue: tmp['labels'].toString().substring(1,tmp['labels'].toString().length-1),
                                           onChanged:(val){
@@ -229,13 +284,26 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
                                             postTmp['labels'] = li;
                                           }
                                       ),
-                                      SizedBox(height:10),
 
-                                      Text("管理状态",style:TextStyle(color:Colors.black,fontSize: 14)),
-                                      MyAdminInfo(tmp, adminState),
+                                      SizedBox(height:20),
 
-                                      Text("操作状态",style:TextStyle(color:Colors.black,fontSize: 14)),
-                                      MyOperatingInfo(tmp, operatingState),
+                                      Container(
+                                        padding: EdgeInsets.only(left:40.0),
+                                        child:Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children:<Widget>[
+                                            IconText("是否锁定",icon:Icon(Icons.lock_open)),
+                                            MyAdminInfo(tmp, adminState),
+                                            SizedBox(height:10),
+                                            //Text("状态",style:TextStyle(color:Colors.black,fontSize: 14)),
+                                            IconText("状态",icon:Icon(Icons.alt_route)),
+                                            MyOperatingInfo(tmp, operatingState),
+                                          ]
+                                        )
+                                      )
+
+                                      //Text("是否锁定",style:TextStyle(color:Colors.black,fontSize: 14)),
+
 
                                     ]
                                 ),
@@ -262,14 +330,16 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
                                           ],
                                         );
                                       }
-                                     );
+                                  );
                                 },
                               )
                           ),
 
+                          Divider(height:2.0,thickness:1.0),
+
                           //deviceService
                           Container(
-                              padding:EdgeInsets.all(16.0),
+                              padding:EdgeInsets.fromLTRB(56.0, 16.0, 16.0, 16.0),
                               child:Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children:<Widget>[
@@ -281,24 +351,28 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
 
                           //deviceProfile
                           Container(
-                              padding:EdgeInsets.all(16.0),
+                              padding:EdgeInsets.fromLTRB(56.0, 16.0, 16.0, 16.0),
                               child:Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children:<Widget>[
                                     Text("设备描述文件",style:TextStyle(color:Colors.green,fontWeight: FontWeight.bold,fontSize: 16)),
                                     MyProfileInfo(tmp),
+                                    SizedBox(height:10),
                                   ]
                               )
                           ),
 
+                          Divider(height:2.0,thickness:1.0),
+
                           //protocols
                           Container(
-                              padding:EdgeInsets.all(16.0),
+                              padding:EdgeInsets.fromLTRB(56.0, 16.0, 16.0, 16.0),
                               child:Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children:<Widget>[
-                                    Text("DeviceAddressable",style:TextStyle(color:Colors.green,fontWeight: FontWeight.bold,fontSize: 16)),
+                                    Text("协议",style:TextStyle(color:Colors.green,fontWeight: FontWeight.bold,fontSize: 16)),
                                     MyProtocolInfo(currentProtocol, tmp, allProtocols),
+                                    SizedBox(height:20),
                                   ]
                               )
                           ),
@@ -311,12 +385,12 @@ class _DeviceInfoPageState extends State<DeviceInfoPage>{
                 return Center(child:Text("加载失败，请刷新页面"));
               }
             }
-        )
-
+        ),
+      ),
     );
   }
-
 }
+
 
 
 //每个dropdownButton的widget，与表单分离开，便于各自的状态管理，防止setState刷新整个widget的状态
@@ -413,7 +487,6 @@ class _MyServiceInfoState extends State<MyServiceInfo>{
             for(int i=0;i<temp.length;i++){
               tempList.add(temp[i]['name'].toString());
             }
-
             return DropdownButton<String>(
               value:tmp['service']['name'],
               onChanged: (String newValue) {

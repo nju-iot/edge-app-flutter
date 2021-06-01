@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-///网格菜单项
+//主页网格菜单项
 class GridItem extends StatelessWidget{
 
   final String title;
@@ -21,8 +21,11 @@ class GridItem extends StatelessWidget{
   Widget build(BuildContext context){
       return Center(
         child:Container(
+            decoration:BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                color: color,
+            ),
             alignment: Alignment.center,
-            color: color,
             child:InkWell(
                 onTap:onTap,
                 child:Column(

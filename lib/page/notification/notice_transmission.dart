@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../http.dart';
 
@@ -27,7 +28,7 @@ class _TransmissionPageState extends State<TransmissionPage>{
                       //child:Expanded(
                       child:PaginatedDataTable(
                         rowsPerPage: tmp.length<=6?tmp.length:6,
-                        header: Text("Transmissions"),
+                        header: Text("传输消息"),
                         headingRowHeight: 24.0,
                         horizontalMargin: 8.0,
                         dataRowHeight: 60.0,
@@ -35,7 +36,16 @@ class _TransmissionPageState extends State<TransmissionPage>{
                           IconButton(
                               icon: Icon(Icons.refresh),
                               onPressed: (){
-                                setState(() {});
+                                setState(() {
+                                  Fluttertoast.showToast(
+                                      msg: "刷新成功",
+                                      gravity: ToastGravity.SNACKBAR,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
+                                });
                               }
                           ),
                           IconButton(
@@ -53,7 +63,7 @@ class _TransmissionPageState extends State<TransmissionPage>{
                       //child:Expanded(
                       child:PaginatedDataTable(
                         rowsPerPage: 1,
-                        header: Text("Transmissions"),
+                        header: Text("传输消息"),
                         headingRowHeight: 24.0,
                         horizontalMargin: 8.0,
                         dataRowHeight: 60.0,
@@ -61,11 +71,20 @@ class _TransmissionPageState extends State<TransmissionPage>{
                           IconButton(
                               icon: Icon(Icons.refresh),
                               onPressed: (){
-                                setState(() {});
+                                setState(() {
+                                  Fluttertoast.showToast(
+                                      msg: "刷新成功",
+                                      gravity: ToastGravity.SNACKBAR,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
+                                });
                               }
                           ),
                         ],
-                        columns: [DataColumn(label:Text("传输信息"))],
+                        columns: [DataColumn(label:Text("所有消息"))],
                         source: MyTransmissionSource(tmp),
                       ),
                       //),

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/utils/SPUtils.dart';
 import 'package:provider/provider.dart';
 
-//使用Provider来做状态管理,主要是主界面的切换
-
+//使用Provider来做状态管理
 
 //状态管理
 class Store {
@@ -16,7 +15,7 @@ class Store {
       providers: [
         ChangeNotifierProvider(create: (_) => AppTheme(getDefaultTheme())),
         ChangeNotifierProvider.value(value: AppStatus(TAB_HOME_EDGE_INDEX)),
-        //ChangeNotifierProvider.value(value: ProtocolStatus('mqtt')),
+        ChangeNotifierProvider.value(value: UserProfile(SPUtils.getUserName())),
       ],
       child: child,
     );
@@ -47,16 +46,16 @@ class AppTheme with ChangeNotifier {
   static final List<MaterialColor> materialColors = [
     Colors.blue,
     Colors.lightBlue,
+    Colors.deepPurple,
+    Colors.purple,
     Colors.red,
     Colors.pink,
-    Colors.purple,
-    Colors.grey,
     Colors.orange,
     Colors.amber,
     Colors.yellow,
+    Colors.lime,
     Colors.lightGreen,
     Colors.green,
-    Colors.lime
   ];
 
   MaterialColor _themeColor;
@@ -77,14 +76,14 @@ class AppTheme with ChangeNotifier {
   get themeColor => _themeColor;
 }
 
-///主页
+//主页
 const int TAB_HOME_EDGE_INDEX = 0;
-///云端控制台
+//云端控制台
 const int TAB_CLOUD_INDEX = 1;
-///用户管理
+//用户
 const int TAB_USER_INDEX = 2;
 
-///应用状态管理
+//主页状态管理
 class AppStatus with ChangeNotifier{
   int _tabIndex;
 
@@ -98,19 +97,17 @@ class AppStatus with ChangeNotifier{
   }
 }
 
-/*class ProtocolStatus with ChangeNotifier{
-  String _value;
-  ProtocolStatus(this._value);
+//用户信息，登录状态管理
+class UserProfile with ChangeNotifier {
+  String _userName;
 
-  String get value => _value;
+  UserProfile(this._userName);
 
-  set value(String newValue){
-    _value = newValue;
-    //notifyListeners();
-    Future.delayed(Duration(milliseconds: 200)).then((e){
-      notifyListeners();
-    });
+  String get userName => _userName;
+
+  set userName(String userName) {
+    _userName = userName;
+    SPUtils.saveUserName(userName);
+    notifyListeners();
   }
-
-
-}*/
+}

@@ -13,10 +13,11 @@ class IndexPage extends StatefulWidget{
   _IndexPageState createState() => new _IndexPageState();
 }
 
+//主页
 class _IndexPageState extends State<IndexPage>{
 
   List<BottomNavigationBarItem> getTabs(BuildContext context) =>[
-    BottomNavigationBarItem(icon: Icon(Icons.airplay),label:"边缘端"),
+    BottomNavigationBarItem(icon: Icon(Icons.airplay),label:"主页"),
     BottomNavigationBarItem(icon: Icon(Icons.cloud),label:"云端"),
     BottomNavigationBarItem(icon: Icon(Icons.account_box),label:"用户"),
   ];
@@ -43,12 +44,22 @@ class _IndexPageState extends State<IndexPage>{
   @override
   Widget build(BuildContext context){
     var tabs = getTabs(context);
+    //provider进行页面状态管理
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
     return Consumer(
       builder: (BuildContext context, AppStatus status,Widget child){
         return Scaffold(
           appBar:AppBar(
             //title:Text("首页"),
             title:Text(tabs[status.tabIndex].label),
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [
+                  appBarColor[800],
+                  appBarColor[200],
+                ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+              ),
+            ),
           ),
           drawer:MyDrawer(),
           body:IndexedStack(

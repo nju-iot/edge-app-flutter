@@ -9,6 +9,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
+import '../page/Login/login.dart';
+import '../page/Login/register.dart';
 import '../page/device/device_add.dart';
 import '../page/device/device_info.dart';
 import '../page/device/device_page.dart';
@@ -41,6 +43,8 @@ class Routes {
   static const String homeRoute = '/home-route';
   static const String cloudRoute = '/cloud-route';
   static const String userRoute = '/user-route';
+  static const String loginPage = '/login-page';
+  static const String registerPage = '/register-page';
   static const String settingPage = '/page/settings';
   static const String themeColorPage = '/theme-color-page';
   static const String devicePage = '/page/device/device_page';
@@ -84,6 +88,8 @@ class Routes {
     homeRoute,
     cloudRoute,
     userRoute,
+    loginPage,
+    registerPage,
     settingPage,
     themeColorPage,
     devicePage,
@@ -112,10 +118,12 @@ class RouterMap extends RouterBase {
   @override
   List<RouteDef> get routes => _routes;
   final _routes = <RouteDef>[
-    RouteDef(Routes.indexPage, page: IndexPage),
+    RouteDef(Routes.indexPage, page: IndexPage, guards: [AuthGuard]),
     RouteDef(Routes.homeRoute, page: HomeRoute),
     RouteDef(Routes.cloudRoute, page: CloudRoute),
     RouteDef(Routes.userRoute, page: UserRoute),
+    RouteDef(Routes.loginPage, page: LoginPage),
+    RouteDef(Routes.registerPage, page: RegisterPage),
     RouteDef(Routes.settingPage, page: SettingPage),
     RouteDef(Routes.themeColorPage, page: ThemeColorPage),
     RouteDef(Routes.devicePage, page: DevicePage),
@@ -152,7 +160,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     HomeRoute: (data) {
@@ -162,7 +170,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     CloudRoute: (data) {
@@ -172,7 +180,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     UserRoute: (data) {
@@ -182,7 +190,27 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
+      );
+    },
+    LoginPage: (data) {
+      return PageRouteBuilder<dynamic>(
+        pageBuilder: (context, animation, secondaryAnimation) => LoginPage(),
+        settings: data,
+        opaque: false,
+        barrierDismissible: false,
+        transitionsBuilder: getTransitions,
+        transitionDuration: const Duration(milliseconds: 1000),
+      );
+    },
+    RegisterPage: (data) {
+      return PageRouteBuilder<dynamic>(
+        pageBuilder: (context, animation, secondaryAnimation) => RegisterPage(),
+        settings: data,
+        opaque: false,
+        barrierDismissible: false,
+        transitionsBuilder: getTransitions,
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     SettingPage: (data) {
@@ -199,7 +227,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     DevicePage: (data) {
@@ -234,7 +262,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     DeviceAddPage: (data) {
@@ -245,7 +273,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     ServiceInfoPage: (data) {
@@ -256,7 +284,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     ProfileInfoPage: (data) {
@@ -267,7 +295,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     SubInfoPage: (data) {
@@ -278,7 +306,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     NotificationInfoPage: (data) {
@@ -289,7 +317,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     SubAddPage: (data) {
@@ -299,7 +327,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     IntervalAddPage: (data) {

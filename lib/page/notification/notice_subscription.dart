@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../http.dart';
 
@@ -34,7 +35,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>{
                       //child:Expanded(
                       child:PaginatedDataTable(
                         rowsPerPage: tmp.length<=6?tmp.length:6,
-                        header: Text("Subscriptions"),
+                        header: Text("订阅"),
                         headingRowHeight: 24.0,
                         horizontalMargin: 8.0,
                         dataRowHeight: 60.0,
@@ -44,6 +45,14 @@ class _SubscriptionPageState extends State<SubscriptionPage>{
                               onPressed: (){
                                 setState(() {
                                   willBeDeleted = [];
+                                  Fluttertoast.showToast(
+                                      msg: "刷新成功",
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
                                 });
                               }
                           ),
@@ -73,10 +82,23 @@ class _SubscriptionPageState extends State<SubscriptionPage>{
                                           child: Text('确认'),
                                           onPressed: () {
                                             for(int i=0;i<willBeDeleted.length;i++){
-                                              MyHttp.delete('/support-notification/api/v1/subscription/${willBeDeleted[i]}');
+                                              MyHttp.delete('/support-notification/api/v1/subscription/${willBeDeleted[i]}').then((value){
+                                                if(i==willBeDeleted.length-1){
+                                                  willBeDeleted = [];
+                                                  Navigator.of(context).pop(true);
+                                                  setState(() {
+                                                    Fluttertoast.showToast(
+                                                        msg: "删除成功",
+                                                        gravity: ToastGravity.CENTER,
+                                                        timeInSecForIosWeb: 1,
+                                                        backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                                        textColor: Colors.white,
+                                                        fontSize: 16.0
+                                                    );
+                                                  });
+                                                }
+                                              });
                                             }
-                                            willBeDeleted = [];
-                                            Navigator.of(context).pop(true);
                                           },
                                         ),
                                       ],
@@ -96,7 +118,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>{
                       //child:Expanded(
                       child:PaginatedDataTable(
                         rowsPerPage: 1,
-                        header: Text("Subscriptions"),
+                        header: Text("订阅消息"),
                         headingRowHeight: 24.0,
                         horizontalMargin: 8.0,
                         dataRowHeight: 60.0,
@@ -108,7 +130,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>{
                               }
                           ),
                         ],
-                        columns: [DataColumn(label:Text("订阅消息"))],
+                        columns: [DataColumn(label:Text("所有订阅"))],
                         source: MySubscriptionSource(tmp),
                       ),
                       //),
@@ -156,18 +178,21 @@ class MySubscriptionSource extends DataTableSource{
         },
         cells:[
           DataCell(
-            ListTile(
-              onTap:(){},
-              //leading:Text("#${index+1}"),
-              title:Text("${data[index]['slug'].toString()}",style:TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text("id: ${data[index]['id'].toString()}"),
-              trailing:IconButton(
-                icon:Icon(Icons.arrow_forward_ios),
-                onPressed: (){
-                  MyRouter.push(Routes.subInfoPage(id:"${data[index]['id'].toString()}"));
-                },
+            SizedBox(
+              width:336.0,
+              child:ListTile(
+                onTap:(){},
+                //leading:Text("#${index+1}"),
+                title:Text("订阅消息${data[index]['slug'].toString().substring(19)}",style:TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text("id: ${data[index]['id'].toString()}",maxLines:2,overflow: TextOverflow.ellipsis,),
+                trailing:IconButton(
+                  icon:Icon(Icons.arrow_forward_ios),
+                  onPressed: (){
+                    MyRouter.push(Routes.subInfoPage(id:"${data[index]['id'].toString()}"));
+                  },
+                ),
               ),
-            ),
+            )
           ),
         ]
     );

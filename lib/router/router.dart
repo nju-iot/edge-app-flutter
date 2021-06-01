@@ -2,7 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
-///使用fluro进行路由管理
+//使用fluro进行路由管理
 class MyRouter {
   static FluroRouter router;
 
@@ -11,11 +11,11 @@ class MyRouter {
     configureRoutes(router);
   }
 
-  ///路由配置
+  //路由配置
   static void configureRoutes(FluroRouter router) {
     router.notFoundHandler = Handler(
         handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-      print("route is not find !");
+      print("找不到该页面 !");
       return null;
     });
   }

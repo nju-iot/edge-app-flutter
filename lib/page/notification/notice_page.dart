@@ -24,14 +24,23 @@ class _NoticePageState extends State<NoticePage> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    MaterialColor appBarColor = Theme.of(context).primaryColor;
     return Scaffold(
       appBar: AppBar(
         title:Text("消息管理"),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              appBarColor[800],
+              appBarColor[200],
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          ),
+        ),
         bottom:TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,
           tabs:<Widget>[
-            Tab(text:"提醒消息"),
+            Tab(text:"通知消息"),
             Tab(text:"订阅消息"),
             Tab(text:"传输信息"),
           ]

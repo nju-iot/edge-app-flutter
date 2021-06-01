@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/http.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class DeviceServicePage extends StatefulWidget{
   @override
@@ -25,7 +26,7 @@ class _DeviceServicePageState extends State<DeviceServicePage>{
                     return Container(
                       child:PaginatedDataTable(
                         rowsPerPage: tmp.length<=6?tmp.length:6,
-                        header: Text("DeviceService"),
+                        header: Text("设备服务"),
                         headingRowHeight: 24.0,
                         horizontalMargin: 8.0,
                         dataRowHeight: 60.0,
@@ -33,7 +34,16 @@ class _DeviceServicePageState extends State<DeviceServicePage>{
                           IconButton(
                               icon: Icon(Icons.refresh),
                               onPressed: (){
-                                setState(() {});
+                                setState(() {
+                                  Fluttertoast.showToast(
+                                      msg: "刷新成功",
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
+                                });
                               }
                           ),
                           IconButton(
@@ -59,7 +69,7 @@ class _DeviceServicePageState extends State<DeviceServicePage>{
                             },
                           ),
                         ],
-                        columns: [DataColumn(label:Text("设备服务信息"))],
+                        columns: [DataColumn(label:Text("基本信息"))],
                         source: MyServiceSource(tmp),
                       ),
                     );
@@ -75,11 +85,20 @@ class _DeviceServicePageState extends State<DeviceServicePage>{
                             IconButton(
                                 icon: Icon(Icons.refresh),
                                 onPressed: (){
-                                  setState(() {});
+                                  setState(() {
+                                    Fluttertoast.showToast(
+                                        msg: "刷新成功",
+                                        gravity: ToastGravity.CENTER,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Theme.of(context).primaryColor.withOpacity(.5),
+                                        textColor: Colors.white,
+                                        fontSize: 16.0
+                                    );
+                                  });
                                 }
                             ),
                           ],
-                          columns: [DataColumn(label:Text("设备服务信息"))],
+                          columns: [DataColumn(label:Text("基本信息"))],
                           source: MyServiceSource(tmp),
                         ),
                     );
@@ -114,7 +133,7 @@ class MyServiceSource extends DataTableSource{
               onTap:(){},
               //leading:Text("#${index+1}"),
               title:Text("${data[index]['name'].toString()}",style:TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text("id: ${data[index]['id'].toString()}"),
+              subtitle: Text("id: ${data[index]['id'].toString()}",maxLines: 2,overflow: TextOverflow.ellipsis),
               trailing:IconButton(
                   icon:Icon(Icons.arrow_forward_ios),
                   onPressed: (){

@@ -2,9 +2,8 @@ import 'package:dio/dio.dart';
 
 //封装请求
 class MyHttp{
+
   MyHttp._internal();
-
-
   //使用Dio来处理网络请求
   static final Dio dio = Dio(
     BaseOptions(
@@ -14,14 +13,12 @@ class MyHttp{
     )
   );
 
-  ///初始化dio
+  //初始化dio
   static init(){
-
-
 
   }
 
-  ///error统一处理
+  //error统一处理
   static void handleError(DioError e) {
     switch (e.type) {
       case DioErrorType.CONNECT_TIMEOUT:
@@ -80,6 +77,5 @@ class MyHttp{
     Response response = await dio.delete(url);
     return response.data;
   }
-
 
 }
