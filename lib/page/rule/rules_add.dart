@@ -33,8 +33,23 @@ class _RulesAddPageState extends State<RulesAddPage> {
         Navigator.of(context).pop();
       }).catchError((error) {
         print(error);
-        print(error.response);
+        showDialog<bool>(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("错误提示"),
+                content: Text(error.response.toString()),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text("确认"),
+                    onPressed: () => Navigator.of(context).pop(true),
+                  ),
+                ],
+              );
+            });
+        FocusScope.of(context).requestFocus(new FocusNode());
       });
+      //获取表单信息
       List<Map<String, dynamic>> result =
           _actionConfigStateKey.currentState.returnActionList();
       (resultData['actions'] as List).addAll(result);
