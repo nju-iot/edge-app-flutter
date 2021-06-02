@@ -101,6 +101,15 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
       if (interval == "") {
         MyHttp.postJson('/support-scheduler/api/v1/interval', _postData)
             .catchError((error) {
+          //发生错误，初始化提交表单数据
+          _postData = {
+            "name": "",
+            "runOnce": false,
+            "frequency": "",
+            "start": "",
+            "end": "",
+            "cron": "",
+          };
           print(error);
           MyHttp.handleError(error);
           return showDialog<bool>(
@@ -130,6 +139,15 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
         print(_postData);
         MyHttp.putJson('/support-scheduler/api/v1/interval', _postData)
             .catchError((error) {
+          //发生错误，初始化提交表单数据
+          _postData = {
+            "name": "",
+            "runOnce": false,
+            "frequency": "",
+            "start": "",
+            "end": "",
+            "cron": "",
+          };
           print(error);
           MyHttp.handleError(error);
           return showDialog<bool>(
