@@ -90,7 +90,7 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
   //提交表单
   void _formSubmit() {
     //TODO: 验证数据正确性
-    if ((_formKey.currentState as FormState).validate()) {
+    if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       _postData["runOnce"] = _runOnce;
       print("表单:" + _postData.toString());
@@ -548,25 +548,15 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
                           //TODO: 根据时间单位修改频率字符串
                           onSaved: (String str) {
                             if (_frequencyMode == FrequencyMode.timeExp) {
-                              if (_frequencyTextController.text
-                                          .substring(str.length - 1) !=
-                                      "h" &&
-                                  _frequencyTextController.text
-                                          .substring(str.length - 1) !=
-                                      "m" &&
-                                  _frequencyTextController.text
-                                          .substring(str.length - 1) !=
-                                      "s") {
-                                if (str == "Hour") {
-                                  _postData['frequency'] =
-                                      _postData['frequency'] + "h";
-                                } else if (str == "Minute") {
-                                  _postData['frequency'] =
-                                      _postData['frequency'] + "m";
-                                } else if (str == "Second") {
-                                  _postData['frequency'] =
-                                      _postData['frequency'] + "s";
-                                }
+                              if (str == "Hour") {
+                                _postData['frequency'] =
+                                    _postData['frequency'] + "h";
+                              } else if (str == "Minute") {
+                                _postData['frequency'] =
+                                    _postData['frequency'] + "m";
+                              } else if (str == "Second") {
+                                _postData['frequency'] =
+                                    _postData['frequency'] + "s";
                               }
                             }
                           },
