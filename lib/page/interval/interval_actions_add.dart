@@ -72,6 +72,13 @@ class _IntervalActionsAddPageState extends State<IntervalActionsAddPage> {
             this._targetOptions = selected;
           })
         },
+        onSaved: (t) {
+          if (t == TargetOptions.coreCommand) {
+            postData['target'] = 'core-command';
+          } else {
+            postData['target'] = 'customized';
+          }
+        },
       ),
     );
   }
@@ -116,6 +123,7 @@ class _IntervalActionsAddPageState extends State<IntervalActionsAddPage> {
                 value: snapshot.data[0]['name'],
                 items: _dropDownIntervalList,
                 onChanged: (str) => {},
+                onSaved: (str) => {postData['interval'] = str},
               ),
             );
           }
@@ -146,6 +154,8 @@ class _IntervalActionsAddPageState extends State<IntervalActionsAddPage> {
       print("表单: ${postData}");
       MyHttp.postJson(':48085/api/v1/intervalaction', postData).then((value) {
         print(value);
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
       }).catchError((error) {
         print(error);
         print(error.response.toString());
@@ -460,9 +470,10 @@ class _TargetConfigWidgetState extends State<TargetConfigWidget> {
           _parametersTextController.text = _parametersTextController.text + "}";
         }
       }
-      _addressTextController.text = "edgex-core-command";
-      _portTextController.text = "48082";
-      _pathTextController.text = json['url'];
+      Uri url = Uri.parse(json['url']);
+      _addressTextController.text = url.host;
+      _portTextController.text = url.port.toString();
+      _pathTextController.text = url.path;
     });
     print("updateTargetConfigForm finish");
   }
@@ -552,7 +563,7 @@ class _TargetConfigWidgetState extends State<TargetConfigWidget> {
               if (value == "") {
                 postData['port'] = null;
               } else {
-                postData['port'] = value;
+                postData['port'] = int.parse(value);
               }
             },
             decoration: InputDecoration(
@@ -577,7 +588,9 @@ class _TargetConfigWidgetState extends State<TargetConfigWidget> {
               child: TextFormField(
                 maxLines: null,
                 controller: _parametersTextController,
-                onSaved: (value) {},
+                onSaved: (value) {
+                  postData['parameters'] = value;
+                },
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),

@@ -199,7 +199,12 @@ class IntervalActionsPageState extends State<IntervalActionsPage> {
                         child: IconButton(
                           icon: Icon(Icons.add),
                           onPressed: () {
-                            MyRouter.push(Routes.intervalActionsAddPage);
+                            MyRouter.pushAndDo(Routes.intervalActionsAddPage,
+                                (_) async {
+                              List<Map<String, dynamic>> data =
+                                  await _getActionList();
+                              _streamController.sink.add(data);
+                            });
                           },
                         ),
                       ),

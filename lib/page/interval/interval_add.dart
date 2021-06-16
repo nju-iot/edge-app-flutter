@@ -10,7 +10,7 @@ import 'package:flutter_app/models/MyInterval.dart';
 
 class IntervalAddPage extends StatefulWidget {
   MyInterval intervalInfo;
-  bool modify = false;
+  bool modify = false; //表示是不是修改
   IntervalAddPage({String intervalString = ""}) {
     if (intervalString != "") {
       intervalString = intervalString

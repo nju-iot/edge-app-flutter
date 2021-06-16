@@ -40,14 +40,32 @@ class IntervalListPageState extends State<IntervalListPage> {
   }
 
   Future<List<Map<String, dynamic>>> _getIntervalList() async {
-    Future<List<Map<String, dynamic>>> futureResult;
+    List<Map<String, dynamic>> intervalList;
+
     await MyHttp.get(":48085/api/v1/interval").then((value) {
-      futureResult = Future<List<Map<String, dynamic>>>.value(List.from(value));
+      intervalList = List.from(value);
     }).catchError((error) {
       MyHttp.handleError(error);
-      futureResult = Future.error(error);
+      return Future.error(error);
     });
-    return futureResult;
+
+    List<Map<String, dynamic>> actionList;
+    await MyHttp.get(":48085/api/v1/intervalaction").then((value) {
+      actionList = List.from(value);
+    }).catchError((error) {
+      MyHttp.handleError(error);
+      return Future.error(error);
+    });
+    intervalList.forEach((interval) {
+      interval['actions'] = [];
+    });
+    actionList.forEach((action) {
+      int intervalIndex = intervalList
+          .indexWhere((interval) => interval['name'] == action['interval']);
+      (intervalList[intervalIndex]['actions'] as List).add(action);
+    });
+    print(intervalList);
+    return intervalList;
   }
 
   @override
@@ -147,60 +165,135 @@ class IntervalListPageState extends State<IntervalListPage> {
                       child: Material(
                         elevation: 4.0,
                         child: Container(
-                            child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: snapshot.data.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Card(
-                              child: ListTile(
-                                leading: Checkbox(
-                                    value: _selectedToDelete.contains(
-                                        snapshot.data[index]['id'].toString()),
-                                    onChanged: (isSelected) {
-                                      if (isSelected) {
-                                        _selectedToDelete.add(snapshot
-                                            .data[index]['id']
-                                            .toString());
-                                      } else {
-                                        _selectedToDelete.remove(snapshot
-                                            .data[index]['id']
-                                            .toString());
-                                      }
-                                      setState(() {});
-                                    }),
-                                onTap: () {},
-                                title: Text(
-                                  "${snapshot.data[index]['name'].toString()}",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Text(
-                                  "id: ${snapshot.data[index]['id'].toString().replaceAll("\n", "")}",
-                                  softWrap: false,
-                                  overflow: TextOverflow.fade,
-                                ),
-                                trailing: IconButton(
-                                  icon: Icon(Icons.arrow_forward_ios),
-                                  onPressed: () {
-                                    //TODO: 跳转到定时任务修改页面
-                                    MyRouter.pushAndDo(
-                                        Routes.intervalInfoPage(
-                                            id: jsonEncode(
-                                                snapshot.data[index])),
-                                        (_) async {
-                                      print("return Back");
-                                      //马上取后端似乎还来不及加入
-                                      await Future.delayed(
-                                          Duration(milliseconds: 500));
-                                      List<Map<String, dynamic>> data =
-                                          await _getIntervalList();
-                                      print(data.length);
-                                      _streamController.sink.add(data);
-                                    });
-                                  },
-                                ),
-                              ),
-                            );
-                          },
+                            child: SingleChildScrollView(
+                          child: ExpansionPanelList.radio(
+                            children: snapshot.data
+                                .map<ExpansionPanelRadio>((interval) {
+                              return ExpansionPanelRadio(
+                                value: interval['id'],
+                                headerBuilder:
+                                    (BuildContext context, bool isExpanded) {
+                                  return ListTile(
+                                    leading: Checkbox(
+                                      value: _selectedToDelete
+                                          .contains(interval['id'].toString()),
+                                      onChanged: (isSelected) {
+                                        if (isSelected) {
+                                          _selectedToDelete
+                                              .add(interval['id'].toString());
+                                        } else {
+                                          _selectedToDelete.remove(
+                                              interval['id'].toString());
+                                        }
+                                        setState(() {});
+                                      },
+                                    ),
+                                    title: Text(
+                                        "${interval['name'].toString()}",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    subtitle: Text(
+                                      "id: ${interval['id'].toString().replaceAll("\n", "")}",
+                                      softWrap: false,
+                                      overflow: TextOverflow.fade,
+                                    ),
+                                    trailing: IconButton(
+                                        icon: Icon(Icons.arrow_forward_ios),
+                                        onPressed: () {
+                                          MyRouter.pushAndDo(
+                                              Routes.intervalInfoPage(
+                                                  id: jsonEncode(interval)),
+                                              (_) async {
+                                            print("return back");
+                                            await Future.delayed(
+                                                Duration(milliseconds: 500));
+                                            List<Map<String, dynamic>> data =
+                                                await _getIntervalList();
+                                            _streamController.sink.add(data);
+                                          });
+                                        }),
+                                  );
+                                },
+                                body: interval['actions'].length == 0
+                                    ? ListTile(
+                                        title: Container(
+                                          margin: EdgeInsets.only(left: 60),
+                                          child: Text(
+                                            "没有任务行动",
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ),
+                                      )
+                                    : ListView.builder(
+                                        itemCount: interval['actions'].length,
+                                        shrinkWrap: true,
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          Color backgroundColor = index % 2 == 0
+                                              ? Colors.grey[100]
+                                              : Colors.blue[50];
+                                          return Container(
+                                            padding: EdgeInsets.only(left: 60),
+                                            color: backgroundColor,
+                                            child: ListTile(
+                                              title: Text(
+                                                  interval['actions'][index]
+                                                      ['name'],
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                              subtitle: Text(
+                                                  interval['actions'][index]
+                                                      ['id'],
+                                                  softWrap: false,
+                                                  overflow: TextOverflow.fade,
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                  )),
+                                              trailing: IconButton(
+                                                  icon: Icon(Icons.delete),
+                                                  onPressed: () async {
+                                                    //TODO: 删除任务行动
+                                                    await MyHttp.delete(
+                                                            ':48085/api/v1/intervalaction/${interval['actions'][index]['id']}')
+                                                        .catchError((error) {
+                                                      print(error);
+                                                      print(error.response);
+                                                      showDialog<bool>(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return AlertDialog(
+                                                              title: const Text(
+                                                                  "错误提示"),
+                                                              content: Text(error
+                                                                  .response
+                                                                  .toString()),
+                                                              actions: <Widget>[
+                                                                FlatButton(
+                                                                    onPressed: () =>
+                                                                        Navigator.of(context).pop(
+                                                                            true),
+                                                                    child: Text(
+                                                                        "确认")),
+                                                              ],
+                                                            );
+                                                          });
+                                                    });
+                                                    List<Map<String, dynamic>>
+                                                        data =
+                                                        await _getIntervalList();
+                                                    _streamController.sink
+                                                        .add(data);
+                                                  }),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                              );
+                            }).toList(),
+                          ),
                         )),
                       ),
                     ),
