@@ -575,7 +575,9 @@ class _TargetConfigWidgetState extends State<TargetConfigWidget> {
           TextFormField(
             controller: _pathTextController,
             //TODO:保存数据
-            onSaved: (value) {},
+            onSaved: (value) {
+              postData['path'] = value;
+            },
             decoration: InputDecoration(
               labelStyle: TextStyle(color: Colors.black),
               floatingLabelBehavior: FloatingLabelBehavior.always,
