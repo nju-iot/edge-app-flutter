@@ -94,36 +94,58 @@ class _RuleListPageState extends State<RuleListPage> {
                         icon: Icon(Icons.delete),
                         onPressed: () async {
                           try {
-                            for (String ruleId in _selectedToDelete) {
-                              print(ruleId);
-                              await MyHttp.delete(
-                                      ':48075/rules/${ruleId.toString()}')
-                                  .catchError((error) {
-                                print(error);
-                                print(error.response);
-                                showDialog<bool>(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text("错误提示"),
-                                        content:
-                                            Text(error.response.toString()),
-                                        actions: <Widget>[
-                                          FlatButton(
-                                              onPressed: () =>
-                                                  Navigator.of(context)
-                                                      .pop(true),
-                                              child: Text("确认"))
-                                        ],
-                                      );
-                                    });
-                              });
-                            }
-                            List<Map<String, dynamic>> data =
-                                await _getRuleList();
-                            _streamController.sink.add(data);
+                            bool confirmDelete = false;
+                            confirmDelete = await showDialog<bool>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text("提示"),
+                                    content: Text("确定要删除选中定时任务吗?"),
+                                    actions: <Widget>[
+                                      FlatButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(false),
+                                          child: Text("取消")),
+                                      FlatButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
+                                        child: Text("确认"),
+                                      ),
+                                    ],
+                                  );
+                                });
+                            if (confirmDelete) {
+                              for (String ruleId in _selectedToDelete) {
+                                print(ruleId);
+                                await MyHttp.delete(
+                                        ':48075/rules/${ruleId.toString()}')
+                                    .catchError((error) {
+                                  print(error);
+                                  print(error.response);
+                                  showDialog<bool>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text("错误提示"),
+                                          content:
+                                              Text(error.response.toString()),
+                                          actions: <Widget>[
+                                            FlatButton(
+                                                onPressed: () =>
+                                                    Navigator.of(context)
+                                                        .pop(true),
+                                                child: Text("确认"))
+                                          ],
+                                        );
+                                      });
+                                });
+                              }
+                              List<Map<String, dynamic>> data =
+                                  await _getRuleList();
+                              _streamController.sink.add(data);
 
-                            _selectedToDelete.clear();
+                              _selectedToDelete.clear();
+                            }
                           } catch (err) {
                             print(err);
                           }

@@ -202,6 +202,7 @@ class _ActionInfoPageState extends State<ActionInfoPage> {
                     _getIntervalList(),
                     Container(
                       child: TextFormField(
+                        style: TextStyle(color: Colors.grey[500]),
                         enabled: false,
                         onSaved: (str) => result['target'] = str,
                         initialValue: widget.actionInfo.target,
@@ -213,6 +214,7 @@ class _ActionInfoPageState extends State<ActionInfoPage> {
                     ),
                     Container(
                       child: TextFormField(
+                        style: TextStyle(color: Colors.grey[500]),
                         enabled: false,
                         onSaved: (str) => result['protocol'] = str,
                         initialValue: widget.actionInfo.protocol,

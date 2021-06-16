@@ -87,43 +87,58 @@ class _StreamListPageState extends State<StreamListPage> {
                         icon: Icon(Icons.delete),
                         onPressed: () async {
                           print(_selectedToDelete);
-                          for (String streamName in _selectedToDelete) {
-                            print('开始删除${streamName}');
-                            await MyHttp.delete(
-                                    ':48075/streams/${streamName.toString()}')
-                                .catchError((error) {
-                              print(error);
-                              print(error.response);
+                          bool confirmDelete = false;
+                          confirmDelete = await showDialog<bool>(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("提示"),
+                                  content: Text("确定要删除选中定时任务吗?"),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                        child: Text("取消")),
+                                    FlatButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(true),
+                                      child: Text("确认"),
+                                    ),
+                                  ],
+                                );
+                              });
+                          if (confirmDelete) {
+                            for (String streamName in _selectedToDelete) {
+                              print('开始删除${streamName}');
+                              await MyHttp.delete(
+                                      ':48075/streams/${streamName.toString()}')
+                                  .catchError((error) {
+                                print(error);
+                                print(error.response);
 
-                              showDialog<bool>(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text("错误提示"),
-                                      content: Text(error.response.toString()),
-                                      actions: <Widget>[
-                                        FlatButton(
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(true),
-                                            child: Text("确认"))
-                                      ],
-                                    );
-                                  });
-                            });
-                            print('结束删除${streamName}');
+                                showDialog<bool>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text("错误提示"),
+                                        content:
+                                            Text(error.response.toString()),
+                                        actions: <Widget>[
+                                          FlatButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context)
+                                                      .pop(true),
+                                              child: Text("确认"))
+                                        ],
+                                      );
+                                    });
+                              });
+                              print('结束删除${streamName}');
+                            }
+                            List<String> data = await _getStreamNameList();
+                            _streamController.sink.add(data);
+                            _selectedToDelete.clear();
                           }
-                          /*
-                          await _selectedToDelete.forEach((streamName) async {
-                            await MyHttp.delete(
-                                    '/rule-engine/streams/${streamName.toString()}')
-                                .catchError((error) {
-                              
-                            });
-                          });
-                          */
-                          List<String> data = await _getStreamNameList();
-                          _streamController.sink.add(data);
-                          _selectedToDelete.clear();
                         }),
                     Expanded(
                       child: IconButton(

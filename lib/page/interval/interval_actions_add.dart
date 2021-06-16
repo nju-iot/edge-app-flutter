@@ -382,6 +382,9 @@ class _DeviceActionListWidgetState extends State<DeviceActionListWidget> {
           child: DropdownButtonFormField(
             validator: (value) {
               if (value == null) {
+                if (_deviceActionList.length == 0) {
+                  return "没有可选设备动作";
+                }
                 return "请选择一个设备动作";
               } else {
                 return null;
@@ -393,15 +396,10 @@ class _DeviceActionListWidgetState extends State<DeviceActionListWidget> {
               labelText: "设备动作",
               labelStyle: TextStyle(color: Colors.black),
               floatingLabelBehavior: FloatingLabelBehavior.always,
-              errorText: "errorText",
-              helperText: "helperText",
-              hintText: "请选择一项设备动作",
-              counterText: "counterText",
+              hintText: _deviceActionList.length == 0 ? "没有可选设备动作" : "请选择一项动作",
             ),
             //如果列表为空，则预设值设null
-            value: _deviceActionList.length == 0
-                ? null
-                : _deviceActionList[0].value,
+            value: null,
             items: _deviceActionList,
             //如果disable为真，则该下拉框失效
             onChanged: (value) {
