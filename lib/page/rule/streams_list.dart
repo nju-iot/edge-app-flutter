@@ -18,6 +18,7 @@ class _StreamListPageState extends State<StreamListPage> {
   final StreamController<List<String>> _streamController = StreamController();
 
   final List<String> _selectedToDelete = [];
+  TextEditingController _searchController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -67,6 +68,13 @@ class _StreamListPageState extends State<StreamListPage> {
     return futureResult;
   }
 
+  Future<List<String>> _filterStreamList(String keyword) async {
+    List<String> data = await _getStreamNameList();
+    List<String> result =
+        data.where((element) => element.contains(keyword)).toList();
+    return Future.value(result);
+  }
+
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -74,10 +82,14 @@ class _StreamListPageState extends State<StreamListPage> {
         body: Column(
           children: <Widget>[
             ListTile(
-              leading: Text("#"),
-              title: Text(
-                "名称",
-                style: TextStyle(fontWeight: FontWeight.bold),
+              leading: Container(
+                  margin: EdgeInsets.only(left: 20), child: Text("#")),
+              title: Container(
+                margin: EdgeInsets.only(left: 8),
+                child: Text(
+                  "名称",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
               trailing: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.2,
@@ -154,6 +166,54 @@ class _StreamListPageState extends State<StreamListPage> {
                     ),
                   ],
                 ),
+              ),
+            ),
+            Container(
+              height: 50,
+              margin: EdgeInsets.only(left: 5, right: 5, bottom: 10),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black26,
+                        offset: Offset(0.0, 3.0), //阴影xy轴偏移量
+                        blurRadius: 2.0, //阴影模糊程度
+                        spreadRadius: 0.5 //阴影扩散程度
+                        ),
+                  ]),
+              child: Row(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(left: 20),
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back_ios),
+                      onPressed: () async {
+                        List<String> data = await _getStreamNameList();
+                        _streamController.sink.add(data);
+                        _searchController.text = "";
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      margin: EdgeInsets.only(left: 5),
+                      child: TextField(
+                        controller: _searchController,
+                        onSubmitted: (keyword) async {
+                          List<String> data = await _filterStreamList(keyword);
+                          _streamController.sink.add(data);
+                        },
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.search,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "请输入数据流名称",
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             StreamBuilder<List<String>>(

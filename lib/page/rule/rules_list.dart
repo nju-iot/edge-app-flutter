@@ -17,7 +17,7 @@ class RuleListPage extends StatefulWidget {
 class _RuleListPageState extends State<RuleListPage> {
   StreamController<List<Map<String, dynamic>>> _streamController =
       StreamController();
-
+  TextEditingController _searchController = TextEditingController();
   final List<String> _selectedToDelete = [];
   @override
   void initState() {
@@ -74,6 +74,18 @@ class _RuleListPageState extends State<RuleListPage> {
     return futureResult;
   }
 
+  Future<List<Map<String, dynamic>>> _filterRuleList(String keyword) async {
+    List<Map<String, dynamic>> data = await _getRuleList();
+    try {
+      List<Map<String, dynamic>> result = data
+          .where((element) => (element['id'] as String).contains(keyword))
+          .toList();
+      return Future.value(List.from(result));
+    } catch (error) {
+      print(error);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -81,10 +93,14 @@ class _RuleListPageState extends State<RuleListPage> {
           body: Column(
             children: <Widget>[
               ListTile(
-                leading: Text("#"),
-                title: Text(
-                  "名称",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                leading: Container(
+                    margin: EdgeInsets.only(left: 20), child: Text("#")),
+                title: Container(
+                  margin: EdgeInsets.only(left: 8),
+                  child: Text(
+                    "名称",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
                 trailing: SizedBox(
                   width: MediaQuery.of(context).size.width * 0.2,
@@ -165,6 +181,56 @@ class _RuleListPageState extends State<RuleListPage> {
                       ),
                     ],
                   ),
+                ),
+              ),
+              Container(
+                height: 50,
+                margin: EdgeInsets.only(left: 5, right: 5, bottom: 10),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black26,
+                          offset: Offset(0.0, 3.0), //阴影xy轴偏移量
+                          blurRadius: 2.0, //阴影模糊程度
+                          spreadRadius: 0.5 //阴影扩散程度
+                          ),
+                    ]),
+                child: Row(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(left: 20),
+                      child: IconButton(
+                        icon: Icon(Icons.arrow_back_ios),
+                        onPressed: () async {
+                          List<Map<String, dynamic>> data =
+                              await _getRuleList();
+                          _streamController.sink.add(data);
+                          _searchController.text = "";
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.only(left: 5),
+                        child: TextField(
+                          controller: _searchController,
+                          onSubmitted: (keyword) async {
+                            List<Map<String, dynamic>> data =
+                                await _filterRuleList(keyword);
+                            _streamController.sink.add(data);
+                          },
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.search,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "请输入规则名称",
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               StreamBuilder<List<Map<String, dynamic>>>(
