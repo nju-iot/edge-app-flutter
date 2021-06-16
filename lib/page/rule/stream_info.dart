@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:auto_route/auto_route_annotations.dart';
-import 'package:flutter_app/router/route_map.gr.dart';
-import 'package:flutter_app/router/router.dart';
 import 'package:flutter_app/http.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +29,7 @@ class _StreamInfoPageState extends State<StreamInfoPage> {
         ),
       ),
       body: FutureBuilder(
-        future: MyHttp.get("/rule-engine/streams/${widget.name}"),
+        future: MyHttp.get(":48075/streams/${widget.name}"),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasError) {

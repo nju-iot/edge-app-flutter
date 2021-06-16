@@ -13,7 +13,7 @@ class RuleInfoPage extends StatefulWidget {
 class _RuleInfoPageState extends State<RuleInfoPage> {
   Future<Map<String, dynamic>> _getRuleInfo() async {
     Map<String, dynamic> data;
-    await MyHttp.get('/rule-engine/rules/${widget.id}').then((value) {
+    await MyHttp.get(':48075/rules/${widget.id}').then((value) {
       data = Map.from(value);
     });
 
@@ -57,6 +57,11 @@ class _RuleInfoPageState extends State<RuleInfoPage> {
                 List<Widget> ruleInfoForm =
                     (snapshot.data as Map<String, dynamic>).entries.map((ent) {
                   if (ent.key.toString() == "actions") {
+                    if (((snapshot.data as Map<String, dynamic>)['actions']
+                            as List)
+                        .any((element) => element.containsKey("log"))) {
+                      return Container();
+                    }
                     return Column(
                       children: ent.value.map<Widget>((e) {
                         print(e is List<String>);
@@ -164,12 +169,14 @@ class _RuleInfoPageState extends State<RuleInfoPage> {
                               child: Text("Send the result to log file.")),
                           Expanded(
                             child: Container(
+                              padding: EdgeInsets.only(right: 150),
                               child: Switch(
                                 value: ((snapshot.data
                                             as Map<String, dynamic>)['actions']
                                         as List)
-                                    .contains({"log": {}}),
-                                onChanged: null,
+                                    .any((element) =>
+                                        element.containsKey("log")),
+                                onChanged: (str) => {},
                               ),
                             ),
                           ),

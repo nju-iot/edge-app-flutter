@@ -9,6 +9,7 @@ import 'package:flutter_app/page/device/device_info.dart';
 import 'package:flutter_app/page/device/device_page.dart';
 import 'package:flutter_app/page/device/profile_info.dart';
 import 'package:flutter_app/page/device/service_info.dart';
+import 'package:flutter_app/page/interval/interval_action_info.dart';
 import 'package:flutter_app/page/interval/interval_info.dart';
 import 'package:flutter_app/page/interval/interval_page.dart';
 import 'package:flutter_app/page/notification/notice_page.dart';
@@ -59,8 +60,11 @@ import 'package:flutter_app/utils/SPUtils.dart';
       AutoRoute(page: IntervalAddPage, path: '/page/interval/add'),
       AutoRoute(
           page: IntervalActionsAddPage, path: '/page/interval/actions_add'),
+      AutoRoute(
+          page: ActionInfoPage, path: '/page/interval/action_info/:actionInfo'),
       AutoRoute(page: IntervalActionsPage, path: '/page/interval/actions'),
-      AutoRoute(page: IntervalInfoPage, path: '/page/interval/info/:id'),
+      AutoRoute(
+          page: IntervalInfoPage, path: '/page/interval/info/:intervalString'),
       AutoRoute(page: StreamsAddPage, path: '/page/rules_engine/streams/add'),
       AutoRoute(
           page: StreamInfoPage, path: '/page/rules_engine/streams/info/:name'),

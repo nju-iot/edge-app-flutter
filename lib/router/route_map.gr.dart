@@ -8,6 +8,7 @@
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/models/MyAction.dart';
 
 import '../page/Login/login.dart';
 import '../page/Login/register.dart';
@@ -16,6 +17,7 @@ import '../page/device/device_info.dart';
 import '../page/device/device_page.dart';
 import '../page/device/profile_info.dart';
 import '../page/device/service_info.dart';
+import '../page/interval/interval_action_info.dart';
 import '../page/interval/interval_actions.dart';
 import '../page/interval/interval_actions_add.dart';
 import '../page/interval/interval_add.dart';
@@ -71,6 +73,10 @@ class Routes {
   static const String subAddPage = '/page/notification/subscription_add';
   static const String intervalAddPage = '/page/interval/add';
   static const String intervalActionsAddPage = '/page/interval/actions_add';
+  static const String _actionInfoPage =
+      '/page/interval/action_info/:actionInfo';
+  static String actionInfoPage({@required dynamic actionInfo}) =>
+      '/page/interval/action_info/$actionInfo';
   static const String intervalActionsPage = '/page/interval/actions';
   static const String _intervalInfoPage = '/page/interval/info/:id';
   static String intervalInfoPage({@required dynamic id}) =>
@@ -105,6 +111,7 @@ class Routes {
     subAddPage,
     intervalAddPage,
     intervalActionsAddPage,
+    _actionInfoPage,
     intervalActionsPage,
     _intervalInfoPage,
     streamsAddPage,
@@ -139,6 +146,7 @@ class RouterMap extends RouterBase {
     RouteDef(Routes.subAddPage, page: SubAddPage),
     RouteDef(Routes.intervalAddPage, page: IntervalAddPage),
     RouteDef(Routes.intervalActionsAddPage, page: IntervalActionsAddPage),
+    RouteDef(Routes._actionInfoPage, page: ActionInfoPage),
     RouteDef(Routes.intervalActionsPage, page: IntervalActionsPage),
     RouteDef(Routes._intervalInfoPage, page: IntervalInfoPage),
     RouteDef(Routes.streamsAddPage, page: StreamsAddPage),
@@ -336,12 +344,12 @@ class RouterMap extends RouterBase {
       );
       return PageRouteBuilder<dynamic>(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            IntervalAddPage(interval: args.interval),
+            IntervalAddPage(intervalString: args.interval),
         settings: data,
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     IntervalActionsAddPage: (data) {
@@ -352,7 +360,23 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
+      );
+    },
+    ActionInfoPage: (data) {
+      final args = data.getArgs<ActionInfoPageArguments>(
+        orElse: () => ActionInfoPageArguments(),
+      );
+      return PageRouteBuilder<dynamic>(
+        pageBuilder: (context, animation, secondaryAnimation) => ActionInfoPage(
+          data.pathParams['actionInfo'].value,
+          key: args.key,
+        ),
+        settings: data,
+        opaque: false,
+        barrierDismissible: false,
+        transitionsBuilder: getTransitions,
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     IntervalActionsPage: (data) {
@@ -363,7 +387,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     IntervalInfoPage: (data) {
@@ -374,7 +398,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     StreamsAddPage: (data) {
@@ -385,7 +409,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     StreamInfoPage: (data) {
@@ -396,7 +420,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     RulesAddPage: (data) {
@@ -407,7 +431,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
     RuleInfoPage: (data) {
@@ -418,7 +442,7 @@ class RouterMap extends RouterBase {
         opaque: false,
         barrierDismissible: false,
         transitionsBuilder: getTransitions,
-        transitionDuration: const Duration(milliseconds: 800),
+        transitionDuration: const Duration(milliseconds: 1000),
       );
     },
   };
@@ -438,4 +462,10 @@ class IndexPageArguments {
 class IntervalAddPageArguments {
   final String interval;
   IntervalAddPageArguments({this.interval = ""});
+}
+
+/// ActionInfoPage arguments holder class
+class ActionInfoPageArguments {
+  final Key key;
+  ActionInfoPageArguments({this.key});
 }

@@ -39,9 +39,10 @@ class _StreamsAddPageState extends State<StreamsAddPage> {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       _showLoadingDialog();
-      MyHttp.postJson("/rule-engine/streams", {"sql": sql})
-          .then((value) => Navigator.of(context).pop())
-          .catchError((error) {
+      MyHttp.postJson(":48075/streams", {"sql": sql}).then((value) {
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+      }).catchError((error) {
         print(error);
         return showDialog<bool>(
             context: context,

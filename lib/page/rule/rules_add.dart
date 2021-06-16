@@ -58,7 +58,8 @@ class _RulesAddPageState extends State<RulesAddPage> {
       (resultData['actions'] as List).addAll(result);
 
       print("表单: ${resultData.toString()}");
-      MyHttp.postJson('/rule-engine/rules', resultData).then((value) {
+      MyHttp.postJson(':48075/rules', resultData).then((value) {
+        Navigator.of(context).pop();
         Navigator.of(context).pop();
       }).catchError((error) {
         print(error);
@@ -702,7 +703,7 @@ class _RestHTTPConfigWidgetState extends State<RestHTTPConfigWidget> {
 
   Future<List<Map<String, dynamic>>> _getDeviceList() async {
     List<Map<String, dynamic>> data;
-    await MyHttp.get('/core-command/api/v1/device').then((value) {
+    await MyHttp.get(':48082/api/v1/device').then((value) {
       data = List.from(value);
     });
     //print(data.toString());

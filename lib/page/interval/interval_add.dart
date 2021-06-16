@@ -9,42 +9,36 @@ import 'package:flutter_app/http.dart';
 import 'package:flutter_app/models/MyInterval.dart';
 
 class IntervalAddPage extends StatefulWidget {
-  final String interval;
-
-  IntervalAddPage({this.interval = ""});
+  MyInterval intervalInfo;
+  bool modify = false;
+  IntervalAddPage({String intervalString = ""}) {
+    if (intervalString != "") {
+      intervalString = intervalString
+          .replaceAll("%7B", "{")
+          .replaceAll("%7D", "}")
+          .replaceAll("%20", " ")
+          .replaceAll("%22", '"');
+      intervalInfo = MyInterval.fromJson(jsonDecode(intervalString));
+      modify = true;
+      print("intervalAddPage----------------");
+      print(intervalInfo.toJson().toString());
+    }
+  }
   @override
-  _IntervalAddPageState createState() =>
-      _IntervalAddPageState(interval: this.interval);
+  _IntervalAddPageState createState() => _IntervalAddPageState();
 }
 
 class _IntervalAddPageState extends State<IntervalAddPage> {
-  _IntervalAddPageState({this.interval});
-  final String interval;
-  MyInterval _myInterval;
   FrequencyMode _frequencyMode = FrequencyMode.timeExp;
-  String _frequencyUnitWord = "Hour";
-  String _frequencyStr = ""; //表示频率
+
   DateTime _enterTime; //打开页面的时间，用于开始时间的初始值，以及日期时间选择器的最小值
   bool _runOnce = false; //只运行一次
   TextEditingController _startDateTextController;
   TextEditingController _startTimeTextController;
   TextEditingController _endDateTextController;
   TextEditingController _endTimeTextController;
-  TextEditingController _cronExpTextController = new TextEditingController();
-  TextEditingController _frequencyTextController = new TextEditingController();
-
-  //频率单位选择
-  List<DropdownMenuItem<String>> _frequencyUnit = [
-    DropdownMenuItem(
-      value: "Hour",
-      child: Text("Hour"),
-    ),
-    DropdownMenuItem(value: "Minute", child: Text("Minute")),
-    DropdownMenuItem(
-      value: "Second",
-      child: Text("Second"),
-    ),
-  ];
+  TextEditingController _cronExpTextController;
+  TextEditingController _frequencyTextController;
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Map<String, dynamic> _postData = {
@@ -98,9 +92,11 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
       _showLoadingDialog();
 
       //根据两种情况发出不同请求
-      if (interval == "") {
-        MyHttp.postJson('/support-scheduler/api/v1/interval', _postData)
-            .catchError((error) {
+      if (widget.modify == false) {
+        MyHttp.postJson(':48085/api/v1/interval', _postData).then((value) {
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        }).catchError((error) {
           //发生错误，初始化提交表单数据
           _postData = {
             "name": "",
@@ -135,10 +131,12 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
           });
         });
       } else {
-        _postData["id"] = _myInterval.id;
+        _postData["id"] = widget.intervalInfo.id;
         print(_postData);
-        MyHttp.putJson('/support-scheduler/api/v1/interval', _postData)
-            .catchError((error) {
+        MyHttp.putJson(':48085/api/v1/interval', _postData).then((value) {
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        }).catchError((error) {
           //发生错误，初始化提交表单数据
           _postData = {
             "name": "",
@@ -149,13 +147,17 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
             "cron": "",
           };
           print(error);
+          print(error.response.toString());
           MyHttp.handleError(error);
           return showDialog<bool>(
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: Text('提示'),
-                  content: Text('添加失败，请检查网络状况或重试'),
+                  content:
+                      (error as DioError).type == DioErrorType.CONNECT_TIMEOUT
+                          ? Text("连接超时，请检查网络状况或重试")
+                          : Text(error.response.toString()),
                   actions: <Widget>[
                     FlatButton(
                       child: Text('确认'),
@@ -183,32 +185,6 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
   void initState() {
     super.initState();
     //开始时间精度为秒
-    if (interval != "") {
-      _myInterval = MyInterval.fromJson(jsonDecode(interval));
-      _frequencyMode = _myInterval.frequencyMode;
-      if (_frequencyMode == FrequencyMode.runOnce) {
-        _runOnce = true;
-      } else if (_frequencyMode == FrequencyMode.cronExp) {
-        _cronExpTextController.text = _myInterval.cron;
-      } else {
-        _frequencyTextController.text = _myInterval.frequency
-            .substring(0, _myInterval.frequency.length - 1);
-        //选择时间单位
-        if (_myInterval.frequency.substring(_myInterval.frequency.length - 1) ==
-            "h") {
-          _frequencyUnitWord = "Hour";
-        } else if (_myInterval.frequency
-                .substring(_myInterval.frequency.length - 1) ==
-            "m") {
-          _frequencyUnitWord = "Minute";
-        } else if (_myInterval.frequency
-                .substring(_myInterval.frequency.length - 1) ==
-            "s") {
-          _frequencyUnitWord = "Second";
-        } else {}
-      }
-    }
-
     DateTime _startDateTime = DateTime.now();
     _enterTime = _startDateTime;
     _startDateTime = DateTime.fromMillisecondsSinceEpoch(
@@ -216,27 +192,72 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
             _startDateTime.millisecondsSinceEpoch % (1000));
 
     List<String> _startDateAndTime = _startDateTime.toString().split(" ");
-    print(_startDateAndTime[0]);
-    print(_startDateAndTime[1]);
-    _startDateTextController =
-        TextEditingController(text: _startDateAndTime[0]);
-    _startTimeTextController = TextEditingController(
-        text:
-            _startDateAndTime[1].substring(0, _startDateAndTime[1].length - 4));
-    _endDateTextController = TextEditingController();
-    _endTimeTextController = TextEditingController();
 
-    if (interval != "") {
-      _startDateTextController.text = _isoString2DateTime(_myInterval.start)
-          .toString()
-          .substring(
-              0, _isoString2DateTime(_myInterval.start).toString().length - 5);
+    if (widget.modify == true) {
+      String date = widget.intervalInfo.start.split("T")[0];
+      _startDateTextController = TextEditingController(
+          text: date.substring(0, 4) +
+              "-" +
+              date.substring(4, 6) +
+              "-" +
+              date.substring(6));
+      print("fuck");
+      print(_startDateTextController.text);
+      String time = widget.intervalInfo.start.split("T")[1];
+      _startTimeTextController = TextEditingController(
+        text: time.substring(0, 2) +
+            ":" +
+            time.substring(2, 4) +
+            ":" +
+            time.substring(4),
+      );
+    } else {
+      _startDateTextController =
+          TextEditingController(text: _startDateAndTime[0]);
+      _startTimeTextController = TextEditingController(
+          text: _startDateAndTime[1]
+              .substring(0, _startDateAndTime[1].length - 4));
+    }
+    if (widget.modify == true) {
+      if (widget.intervalInfo.end != null) {
+        String date = widget.intervalInfo.end.split("T")[0];
+        String time = widget.intervalInfo.end.split("T")[1];
+        _endDateTextController = TextEditingController(
+            text: date.substring(0, 4) +
+                "-" +
+                date.substring(4, 6) +
+                "-" +
+                date.substring(6));
 
-      if (_myInterval.end != null) {
-        _endDateTextController.text = _isoString2DateTime(_myInterval.end)
-            .toString()
-            .substring(
-                0, _isoString2DateTime(_myInterval.end).toString().length - 5);
+        _endTimeTextController = TextEditingController(
+          text: time.substring(0, 2) +
+              ":" +
+              time.substring(2, 4) +
+              ":" +
+              time.substring(4),
+        );
+      } else {
+        _endDateTextController = TextEditingController();
+        _endTimeTextController = TextEditingController();
+      }
+    } else {
+      _endDateTextController = TextEditingController();
+      _endTimeTextController = TextEditingController();
+    }
+
+    _frequencyTextController = TextEditingController();
+    _cronExpTextController = TextEditingController();
+    if (widget.modify == true) {
+      this._frequencyMode = widget.intervalInfo.frequencyMode;
+      if (_frequencyMode == FrequencyMode.runOnce) {
+        _runOnce = true;
+      } else if (_frequencyMode == FrequencyMode.timeExp) {
+        _frequencyTextController = TextEditingController(
+            text: widget.intervalInfo.frequency
+                .substring(0, widget.intervalInfo.frequency.length - 1));
+      } else {
+        _cronExpTextController =
+            TextEditingController(text: widget.intervalInfo.cron);
       }
     }
   }
@@ -263,12 +284,21 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
                           child: Text("取消"),
                           onPressed: () => Navigator.of(context).pop()),
                       CupertinoButton(
+                          child: Text("清空"),
+                          onPressed: () {
+                            _textController.text = "";
+                            Navigator.of(context).pop();
+                          }),
+                      CupertinoButton(
                           child: Text("确认"),
                           onPressed: () {
                             _textController.text = _confirmTime
                                 .toString()
                                 .substring(
                                     0, _confirmTime.toString().length - 7);
+                            if (_textController.text.length == 7) {
+                              _textController.text = "0" + _textController.text;
+                            }
                             Navigator.of(context).pop();
                           })
                     ],
@@ -323,6 +353,12 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                     CupertinoButton(
+                        child: Text("清空"),
+                        onPressed: () {
+                          _textController.text = "";
+                          Navigator.of(context).pop();
+                        }),
+                    CupertinoButton(
                       child: Text("确认"),
                       onPressed: () {
                         setState(() {
@@ -360,7 +396,7 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
     MaterialColor appBarColor = Theme.of(context).primaryColor;
     return Scaffold(
       appBar: AppBar(
-        title: Text(this.interval == "" ? "新增定时任务" : "修改定时任务"),
+        title: Text(widget.modify == false ? "新增定时任务" : "修改定时任务"),
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
@@ -382,10 +418,12 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
           child: Column(
             children: <Widget>[
               TextFormField(
-                style:
-                    this.interval == "" ? null : TextStyle(color: Colors.grey),
-                enabled: this.interval == "",
-                initialValue: this?._myInterval?.name,
+                style: widget.modify == false
+                    ? null
+                    : TextStyle(color: Colors.grey),
+                enabled: widget.modify == false,
+                initialValue:
+                    widget.modify == true ? widget.intervalInfo.name : "",
                 onSaved: (text) => _postData['name'] = text,
                 validator: (str) => str != "" ? null : "名称不得为空",
                 decoration: InputDecoration(
@@ -400,6 +438,13 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
                   Container(
                     width: MediaQuery.of(context).size.width * 0.35,
                     child: TextFormField(
+                      autovalidateMode: AutovalidateMode.always,
+                      validator: (str) {
+                        if (str == "") {
+                          return "请选择开始日期";
+                        }
+                        return null;
+                      },
                       onSaved: (startTimeStr) {
                         _postData["start"] =
                             startTimeStr.replaceAll("-", "") + "T";
@@ -422,6 +467,13 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
                           left: MediaQuery.of(context).size.width * 0.1),
                       width: MediaQuery.of(context).size.width * 0.35,
                       child: TextFormField(
+                        autovalidateMode: AutovalidateMode.always,
+                        validator: (value) {
+                          if (value == "") {
+                            return "请选择开始时间";
+                          }
+                          return null;
+                        },
                         onSaved: (str) {
                           _postData["start"] =
                               _postData["start"] + str.replaceAll(":", "");
@@ -446,8 +498,19 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
                   Container(
                     width: MediaQuery.of(context).size.width * 0.35,
                     child: TextFormField(
+                      autovalidateMode: AutovalidateMode.always,
+                      validator: (str) {
+                        if (str == "") {
+                          if (_endTimeTextController.text != "") {
+                            return "请选择结束日期";
+                          }
+                        }
+                      },
                       onSaved: (endTimeStr) {
-                        _postData["end"] = endTimeStr.replaceAll("-", "") + "T";
+                        if (endTimeStr != "" && _endDateTextController != "") {
+                          _postData["end"] =
+                              endTimeStr.replaceAll("-", "") + "T";
+                        }
                       },
                       onTap: () {
                         _showDatePicker(_endDateTextController);
@@ -467,6 +530,15 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
                           left: MediaQuery.of(context).size.width * 0.1),
                       width: MediaQuery.of(context).size.width * 0.35,
                       child: TextFormField(
+                        autovalidateMode: AutovalidateMode.always,
+                        validator: (str) {
+                          if (str == "") {
+                            if (_endDateTextController.text != "") {
+                              return "请选择结束时间";
+                            }
+                          }
+                          return null;
+                        },
                         onSaved: (str) {
                           _postData["end"] =
                               _postData["end"] + str.replaceAll(":", "");
@@ -557,8 +629,23 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
                       child: Container(
                         margin: EdgeInsets.only(top: 11),
                         child: DropdownButtonFormField(
-                          value: _frequencyUnitWord,
-                          items: _frequencyUnit,
+                          value: (widget.modify == true &&
+                                  widget.intervalInfo.frequencyMode ==
+                                      FrequencyMode.timeExp)
+                              ? (widget.intervalInfo.frequency.substring(
+                                  widget.intervalInfo.frequency.length - 1))
+                              : "h",
+                          items: [
+                            DropdownMenuItem(
+                              value: "h",
+                              child: Text("Hour"),
+                            ),
+                            DropdownMenuItem(value: "m", child: Text("Minute")),
+                            DropdownMenuItem(
+                              value: "s",
+                              child: Text("Second"),
+                            ),
+                          ],
                           onChanged:
                               this._frequencyMode == FrequencyMode.timeExp
                                   ? (str) => {}
@@ -566,16 +653,8 @@ class _IntervalAddPageState extends State<IntervalAddPage> {
                           //TODO: 根据时间单位修改频率字符串
                           onSaved: (String str) {
                             if (_frequencyMode == FrequencyMode.timeExp) {
-                              if (str == "Hour") {
-                                _postData['frequency'] =
-                                    _postData['frequency'] + "h";
-                              } else if (str == "Minute") {
-                                _postData['frequency'] =
-                                    _postData['frequency'] + "m";
-                              } else if (str == "Second") {
-                                _postData['frequency'] =
-                                    _postData['frequency'] + "s";
-                              }
+                              _postData['frequency'] =
+                                  _postData['frequency'] + str;
                             }
                           },
                         ),

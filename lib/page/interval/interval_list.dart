@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/router/route_map.gr.dart';
 import 'package:flutter_app/router/router.dart';
@@ -40,13 +41,12 @@ class IntervalListPageState extends State<IntervalListPage> {
 
   Future<List<Map<String, dynamic>>> _getIntervalList() async {
     Future<List<Map<String, dynamic>>> futureResult;
-    await MyHttp.get("/support-scheduler/api/v1/interval").then((value) {
+    await MyHttp.get(":48085/api/v1/interval").then((value) {
       futureResult = Future<List<Map<String, dynamic>>>.value(List.from(value));
     }).catchError((error) {
       MyHttp.handleError(error);
       futureResult = Future.error(error);
     });
-
     return futureResult;
   }
 
@@ -64,35 +64,58 @@ class IntervalListPageState extends State<IntervalListPage> {
                   IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () async {
-                        for (String intervalId in _selectedToDelete) {
-                          await MyHttp.delete(
-                                  '/support-scheduler/api/v1/interval/${intervalId}')
-                              .catchError((error) {
-                            print(error);
-                            print(error.response);
-                            showDialog<bool>(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text("错误提示"),
-                                    content: Text(error.response.toString()),
-                                    actions: <Widget>[
-                                      FlatButton(
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(true),
-                                          child: Text("确认"))
-                                    ],
-                                  );
-                                });
-                          });
+                        bool confirmDelete = false;
+                        confirmDelete = await showDialog<bool>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text("提示"),
+                                content: Text("确定要删除选中定时任务吗?"),
+                                actions: <Widget>[
+                                  FlatButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(false),
+                                      child: Text("取消")),
+                                  FlatButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(true),
+                                    child: Text("确认"),
+                                  ),
+                                ],
+                              );
+                            });
+                        print(confirmDelete);
+                        if (confirmDelete) {
+                          for (String intervalId in _selectedToDelete) {
+                            await MyHttp.delete(
+                                    ':48085/api/v1/interval/${intervalId}')
+                                .catchError((error) {
+                              print(error);
+                              print(error.response);
+                              showDialog<bool>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text("错误提示"),
+                                      content: Text(error.response.toString()),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(true),
+                                            child: Text("确认"))
+                                      ],
+                                    );
+                                  });
+                            });
+                          }
+
+                          List<Map<String, dynamic>> data =
+                              await _getIntervalList();
+                          _streamController.sink.add(data);
+
+                          //清空待删数据组
+                          _selectedToDelete.clear();
                         }
-
-                        List<Map<String, dynamic>> data =
-                            await _getIntervalList();
-                        _streamController.sink.add(data);
-
-                        //清空待删数据组
-                        _selectedToDelete.clear();
                       }),
                   Expanded(
                     child: IconButton(
@@ -151,14 +174,28 @@ class IntervalListPageState extends State<IntervalListPage> {
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 subtitle: Text(
-                                    "id: ${snapshot.data[index]['id'].toString()}"),
+                                  "id: ${snapshot.data[index]['id'].toString().replaceAll("\n", "")}",
+                                  softWrap: false,
+                                  overflow: TextOverflow.fade,
+                                ),
                                 trailing: IconButton(
                                   icon: Icon(Icons.arrow_forward_ios),
                                   onPressed: () {
                                     //TODO: 跳转到定时任务修改页面
-                                    MyRouter.push(Routes.intervalInfoPage(
-                                        id: snapshot.data[index]['id']
-                                            .toString()));
+                                    MyRouter.pushAndDo(
+                                        Routes.intervalInfoPage(
+                                            id: jsonEncode(
+                                                snapshot.data[index])),
+                                        (_) async {
+                                      print("return Back");
+                                      //马上取后端似乎还来不及加入
+                                      await Future.delayed(
+                                          Duration(milliseconds: 500));
+                                      List<Map<String, dynamic>> data =
+                                          await _getIntervalList();
+                                      print(data.length);
+                                      _streamController.sink.add(data);
+                                    });
                                   },
                                 ),
                               ),

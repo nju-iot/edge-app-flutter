@@ -65,7 +65,7 @@ class _RuleListPageState extends State<RuleListPage> {
 
   Future<List<Map<String, dynamic>>> _getRuleList() async {
     Future<List<Map<String, dynamic>>> futureResult;
-    await MyHttp.get('/rule-engine/rules').then((value) {
+    await MyHttp.get(':48075/rules').then((value) {
       futureResult = Future<List<Map<String, dynamic>>>.value(List.from(value));
     }).catchError((error) {
       MyHttp.handleError(error);
@@ -97,7 +97,7 @@ class _RuleListPageState extends State<RuleListPage> {
                             for (String ruleId in _selectedToDelete) {
                               print(ruleId);
                               await MyHttp.delete(
-                                      '/rule-engine/rules/${ruleId.toString()}')
+                                      ':48075/rules/${ruleId.toString()}')
                                   .catchError((error) {
                                 print(error);
                                 print(error.response);
@@ -133,7 +133,12 @@ class _RuleListPageState extends State<RuleListPage> {
                         child: IconButton(
                             icon: Icon(Icons.add),
                             onPressed: () {
-                              MyRouter.push(Routes.rulesAddPage);
+                              MyRouter.pushAndDo(Routes.rulesAddPage,
+                                  (_) async {
+                                List<Map<String, dynamic>> data =
+                                    await _getRuleList();
+                                _streamController.sink.add(data);
+                              });
                             }),
                       ),
                     ],
@@ -165,7 +170,25 @@ class _RuleListPageState extends State<RuleListPage> {
                                               context: context,
                                               builder: (BuildContext context) {
                                                 return SimpleDialog(
-                                                  title: const Text("请选择操作"),
+                                                  title: RichText(
+                                                    text: TextSpan(
+                                                        text: "请选择针对",
+                                                        style: TextStyle(
+                                                            fontSize: 20,
+                                                            color:
+                                                                Colors.black),
+                                                        children: [
+                                                          TextSpan(
+                                                              text:
+                                                                  " ${snapshot.data[index]['id']} ",
+                                                              style: TextStyle(
+                                                                  fontSize: 24,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold)),
+                                                          TextSpan(text: "的操作"),
+                                                        ]),
+                                                  ),
                                                   children: <Widget>[
                                                     SimpleDialogOption(
                                                       child: Padding(
@@ -216,15 +239,15 @@ class _RuleListPageState extends State<RuleListPage> {
                                       switch (ruleStatusAction) {
                                         case RuleStatusAction.Start:
                                           result = MyHttp.post(
-                                              '/rule-engine/rules/${snapshot.data[index]['id'].toString()}/start');
+                                              ':48075/rules/${snapshot.data[index]['id'].toString()}/start');
                                           break;
                                         case RuleStatusAction.Stop:
                                           result = MyHttp.post(
-                                              '/rule-engine/rules/${snapshot.data[index]['id'].toString()}/stop');
+                                              ':48075/rules/${snapshot.data[index]['id'].toString()}/stop');
                                           break;
                                         case RuleStatusAction.ReStart:
                                           result = MyHttp.post(
-                                              '/rule-engine/rules/${snapshot.data[index]['id'].toString()}/restart');
+                                              ':48075/rules/${snapshot.data[index]['id'].toString()}/restart');
                                           break;
                                         default:
                                           return;
@@ -295,7 +318,14 @@ class _RuleListPageState extends State<RuleListPage> {
                                           fontWeight: FontWeight.bold),
                                     ),
                                     subtitle: Text(
-                                        "${snapshot.data[index]['status'].toString()}"),
+                                      "${snapshot.data[index]['status'].toString()}",
+                                      overflow: TextOverflow.fade,
+                                      softWrap: false,
+                                      style: snapshot.data[index]['status'] !=
+                                              'Running'
+                                          ? TextStyle(color: Colors.red[300])
+                                          : null,
+                                    ),
                                     trailing: IconButton(
                                         icon: Icon(Icons.arrow_forward_ios),
                                         onPressed: () {

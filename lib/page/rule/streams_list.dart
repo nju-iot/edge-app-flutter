@@ -58,7 +58,7 @@ class _StreamListPageState extends State<StreamListPage> {
   Future<List<String>> _getStreamNameList() async {
     List<String> streamNameList;
     Future<List<String>> futureResult;
-    await MyHttp.get('/rule-engine/streams').then((value) {
+    await MyHttp.get(':48075/streams').then((value) {
       futureResult = Future<List<String>>.value(List.from(value));
     }).catchError((error) {
       MyHttp.handleError(error);
@@ -90,7 +90,7 @@ class _StreamListPageState extends State<StreamListPage> {
                           for (String streamName in _selectedToDelete) {
                             print('开始删除${streamName}');
                             await MyHttp.delete(
-                                    '/rule-engine/streams/${streamName.toString()}')
+                                    ':48075/streams/${streamName.toString()}')
                                 .catchError((error) {
                               print(error);
                               print(error.response);
@@ -130,7 +130,7 @@ class _StreamListPageState extends State<StreamListPage> {
                           icon: Icon(Icons.add),
                           onPressed: () {
                             MyRouter.pushAndDo(Routes.streamsAddPage,
-                                (value) async {
+                                (_) async {
                               print("returnback");
                               List<String> data = await _getStreamNameList();
                               _streamController.sink.add(data);

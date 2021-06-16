@@ -1,22 +1,17 @@
 import 'package:dio/dio.dart';
 
 //封装请求
-class MyHttp{
-
+class MyHttp {
   MyHttp._internal();
   //使用Dio来处理网络请求
-  static final Dio dio = Dio(
-    BaseOptions(
-      baseUrl:"http://106.14.157.113:9922",
-      connectTimeout:5000,
-      receiveTimeout:3000,
-    )
-  );
+  static final Dio dio = Dio(BaseOptions(
+    baseUrl: "http://127.0.0.1",
+    connectTimeout: 5000,
+    receiveTimeout: 3000,
+  ));
 
   //初始化dio
-  static init(){
-
-  }
+  static init() {}
 
   //error统一处理
   static void handleError(DioError e) {
@@ -43,10 +38,10 @@ class MyHttp{
   }
 
   //封装get
-  static Future get(String url,[Map<String,dynamic> params]) async {
+  static Future get(String url, [Map<String, dynamic> params]) async {
     Response response;
-    if(params != null){
-      response = await dio.get(url,queryParameters: params);
+    if (params != null) {
+      response = await dio.get(url, queryParameters: params);
     } else {
       response = await dio.get(url);
     }
@@ -54,8 +49,8 @@ class MyHttp{
   }
 
   //post 表单请求
-  static Future post(String url,[Map<String,dynamic> params]) async {
-    Response response = await dio.post(url,queryParameters: params);
+  static Future post(String url, [Map<String, dynamic> params]) async {
+    Response response = await dio.post(url, queryParameters: params);
     return response.data;
   }
 
@@ -65,17 +60,15 @@ class MyHttp{
     return response.data;
   }
 
-
   //put请求
-  static Future putJson(String url,[Map<String,dynamic> data]) async{
-    Response response = await dio.put(url,data:data);
+  static Future putJson(String url, [Map<String, dynamic> data]) async {
+    Response response = await dio.put(url, data: data);
     return response.data;
   }
 
   //delete请求
-  static Future delete(String url) async{
+  static Future delete(String url) async {
     Response response = await dio.delete(url);
     return response.data;
   }
-
 }

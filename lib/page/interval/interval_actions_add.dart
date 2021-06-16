@@ -78,7 +78,7 @@ class _IntervalActionsAddPageState extends State<IntervalActionsAddPage> {
 
   Widget _getIntervalList() {
     return FutureBuilder(
-      future: MyHttp.get('/support-scheduler/api/v1/interval'),
+      future: MyHttp.get(':48085/api/v1/interval'),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
@@ -144,8 +144,7 @@ class _IntervalActionsAddPageState extends State<IntervalActionsAddPage> {
       print('验证通过');
       //TODO: 弹出加载动画
       print("表单: ${postData}");
-      MyHttp.postJson('/support-scheduler/api/v1/intervalaction', postData)
-          .then((value) {
+      MyHttp.postJson(':48085/api/v1/intervalaction', postData).then((value) {
         print(value);
       }).catchError((error) {
         print(error);
@@ -214,6 +213,8 @@ class _IntervalActionsAddPageState extends State<IntervalActionsAddPage> {
               _getTargetList(),
               if (_targetOptions == TargetOptions.coreCommand)
                 DeviceNameListWidget(),
+              if (_targetOptions == TargetOptions.customized)
+                TargetConfigWidget(),
             ],
           ),
         ),
@@ -247,7 +248,7 @@ class _DeviceNameListWidgetState extends State<DeviceNameListWidget> {
   Widget build(BuildContext context) {
     print("DeviceNameListWidgetState build");
     return FutureBuilder(
-      future: MyHttp.get("/core-command/api/v1/device"),
+      future: MyHttp.get(":48082/api/v1/device"),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
@@ -408,34 +409,16 @@ class _DeviceActionListWidgetState extends State<DeviceActionListWidget> {
             onSaved: (value) {},
           ),
         ),
-        TargetConfigWidget(targetConfigKey),
+        TargetConfigWidget(key: targetConfigKey),
       ],
     );
   }
 }
 
-class ShareDataWidget extends InheritedWidget {
-  ShareDataWidget({@required this.data, Widget child}) : super(child: child);
-
-  final int data;
-
-  static ShareDataWidget of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<ShareDataWidget>();
-  }
-
-  //该回调决定当data发生变化时，是否通知子树中依赖data的Widget
-  @override
-  bool updateShouldNotify(ShareDataWidget old) {
-    //如果返回true，则子树中依赖(build函数中有调用)本widget
-    //的子widget的`state.didChangeDependencies`会被调用
-    return old.data != data;
-  }
-}
-
 //TargetConfig部分独立出来，以避免在选择方法的时候rebuild整个页面
 class TargetConfigWidget extends StatefulWidget {
-  final Key key;
-  TargetConfigWidget(this.key);
+  Key key;
+  TargetConfigWidget({this.key});
 
   @override
   _TargetConfigWidgetState createState() => _TargetConfigWidgetState();
