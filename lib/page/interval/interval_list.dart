@@ -86,7 +86,7 @@ class IntervalListPageState extends State<IntervalListPage> {
     return RefreshIndicator(
       child: Scaffold(
         body: Container(
-          color: Colors.grey[300],
+          color: Colors.grey[200],
           child: Column(
             children: <Widget>[
               ListTile(
@@ -302,7 +302,16 @@ class IntervalListPageState extends State<IntervalListPage> {
                                               ),
                                             ),
                                           )
-                                        : ListView.builder(
+                                        : ListView.separated(
+                                            separatorBuilder:
+                                                (BuildContext context,
+                                                    int index) {
+                                              Widget divider = Divider(
+                                                color: Colors.grey,
+                                                height: 1,
+                                              );
+                                              return divider;
+                                            },
                                             itemCount:
                                                 interval['actions'].length,
                                             shrinkWrap: true,
@@ -314,103 +323,143 @@ class IntervalListPageState extends State<IntervalListPage> {
                                                       : Colors.blue[50];
                                               return Container(
                                                 height: 75,
-                                                padding:
-                                                    EdgeInsets.only(left: 60),
-                                                color: backgroundColor,
-                                                child: ListTile(
-                                                  title: Text(
-                                                      interval['actions'][index]
-                                                          ['name'],
-                                                      style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.bold)),
-                                                  subtitle: Text(
-                                                      interval['actions'][index]
-                                                          ['id'],
-                                                      softWrap: false,
-                                                      overflow:
-                                                          TextOverflow.fade,
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                      )),
-                                                  trailing: IconButton(
-                                                      icon: Icon(Icons.delete),
-                                                      onPressed: () async {
-                                                        //TODO: 删除任务行动
-                                                        bool confirmDelete =
-                                                            false;
-                                                        confirmDelete =
-                                                            await showDialog<
-                                                                    bool>(
-                                                                context:
-                                                                    context,
-                                                                builder:
-                                                                    (BuildContext
-                                                                        context) {
-                                                                  return AlertDialog(
-                                                                    title: const Text(
-                                                                        "操作提示"),
-                                                                    content: Text(
-                                                                        "确定删除 ${interval['actions'][index]['name']} 行动吗?"),
-                                                                    actions: [
-                                                                      FlatButton(
-                                                                          onPressed:
-                                                                              () {
-                                                                            Navigator.of(context).pop(false);
-                                                                          },
-                                                                          child:
-                                                                              Text("取消")),
-                                                                      FlatButton(
-                                                                          onPressed:
-                                                                              () {
-                                                                            Navigator.of(context).pop(true);
-                                                                          },
-                                                                          child:
-                                                                              Text("确认")),
-                                                                    ],
-                                                                  );
-                                                                });
-                                                        if (confirmDelete) {
-                                                          await MyHttp.delete(
-                                                                  ':48085/api/v1/intervalaction/${interval['actions'][index]['id']}')
-                                                              .catchError(
-                                                                  (error) {
-                                                            print(error);
-                                                            print(
-                                                                error.response);
-                                                            showDialog<bool>(
-                                                                context:
-                                                                    context,
-                                                                builder:
-                                                                    (BuildContext
-                                                                        context) {
-                                                                  return AlertDialog(
-                                                                    title: const Text(
-                                                                        "错误提示"),
-                                                                    content: Text(error
-                                                                        .response
-                                                                        .toString()),
-                                                                    actions: <
-                                                                        Widget>[
-                                                                      FlatButton(
-                                                                          onPressed: () => Navigator.of(context).pop(
-                                                                              true),
-                                                                          child:
-                                                                              Text("确认")),
-                                                                    ],
-                                                                  );
-                                                                });
-                                                          });
-                                                          List<
-                                                                  Map<String,
-                                                                      dynamic>>
-                                                              data =
-                                                              await _getIntervalList();
-                                                          _streamController.sink
-                                                              .add(data);
-                                                        }
-                                                      }),
+                                                color: Colors.white,
+                                                child: Container(
+                                                  child: ListTile(
+                                                    onTap: () {
+                                                      Map<String, dynamic> m =
+                                                          interval['actions']
+                                                              [index];
+                                                      m['path'] = m['path']
+                                                          .replaceAll('/', '.');
+                                                      MyRouter.pushAndDo(
+                                                          Routes.actionInfoPage(
+                                                              actionInfo:
+                                                                  jsonEncode(
+                                                                      m)),
+                                                          (_) async {
+                                                        List<
+                                                                Map<String,
+                                                                    dynamic>>
+                                                            data =
+                                                            await _getIntervalList();
+                                                        _streamController.sink
+                                                            .add(data);
+                                                      });
+                                                    },
+                                                    leading: Container(
+                                                      margin: EdgeInsets.only(
+                                                          top: 15, left: 20),
+                                                      child: Text(
+                                                          "${index + 1}",
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                    ),
+                                                    title: Container(
+                                                      margin: EdgeInsets.only(
+                                                          top: 20, left: 10),
+                                                      child: Text(
+                                                          interval['actions']
+                                                              [index]['name'],
+                                                          style: TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                    ),
+                                                    subtitle: Container(
+                                                      margin: EdgeInsets.only(
+                                                          left: 10),
+                                                      child: Text(
+                                                          "id: ${interval['actions'][index]['id']}",
+                                                          softWrap: false,
+                                                          overflow:
+                                                              TextOverflow.fade,
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                          )),
+                                                    ),
+                                                    trailing: IconButton(
+                                                        icon:
+                                                            Icon(Icons.delete),
+                                                        onPressed: () async {
+                                                          //TODO: 删除任务行动
+                                                          bool confirmDelete =
+                                                              false;
+                                                          confirmDelete =
+                                                              await showDialog<
+                                                                      bool>(
+                                                                  context:
+                                                                      context,
+                                                                  builder:
+                                                                      (BuildContext
+                                                                          context) {
+                                                                    return AlertDialog(
+                                                                      title: const Text(
+                                                                          "操作提示"),
+                                                                      content: Text(
+                                                                          "确定删除 ${interval['actions'][index]['name']} 行动吗?"),
+                                                                      actions: [
+                                                                        FlatButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              Navigator.of(context).pop(false);
+                                                                            },
+                                                                            child:
+                                                                                Text("取消")),
+                                                                        FlatButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              Navigator.of(context).pop(true);
+                                                                            },
+                                                                            child:
+                                                                                Text("确认")),
+                                                                      ],
+                                                                    );
+                                                                  });
+                                                          if (confirmDelete) {
+                                                            await MyHttp.delete(
+                                                                    ':48085/api/v1/intervalaction/${interval['actions'][index]['id']}')
+                                                                .catchError(
+                                                                    (error) {
+                                                              print(error);
+                                                              print(error
+                                                                  .response);
+                                                              showDialog<bool>(
+                                                                  context:
+                                                                      context,
+                                                                  builder:
+                                                                      (BuildContext
+                                                                          context) {
+                                                                    return AlertDialog(
+                                                                      title: const Text(
+                                                                          "错误提示"),
+                                                                      content: Text(error
+                                                                          .response
+                                                                          .toString()),
+                                                                      actions: <
+                                                                          Widget>[
+                                                                        FlatButton(
+                                                                            onPressed: () =>
+                                                                                Navigator.of(context).pop(true),
+                                                                            child: Text("确认")),
+                                                                      ],
+                                                                    );
+                                                                  });
+                                                            });
+                                                            List<
+                                                                    Map<String,
+                                                                        dynamic>>
+                                                                data =
+                                                                await _getIntervalList();
+                                                            _streamController
+                                                                .sink
+                                                                .add(data);
+                                                          }
+                                                        }),
+                                                  ),
                                                 ),
                                               );
                                             },
