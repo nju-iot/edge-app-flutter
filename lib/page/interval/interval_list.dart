@@ -120,9 +120,71 @@ class IntervalListPageState extends State<IntervalListPage> {
                                   ],
                                 );
                               });
-                          print(confirmDelete);
+                          //检查是否有对应任务行动
+
+                          List<Map<String, dynamic>> intervalList =
+                              await _getIntervalList();
+                          List<Map<String, dynamic>> selectedInterval =
+                              intervalList
+                                  .where((i) =>
+                                      _selectedToDelete.contains(i['id']))
+                                  .toList();
+                          selectedInterval
+                              .retainWhere((i) => i['actions'].length != 0);
+
+                          if (selectedInterval.length != 0) {
+                            confirmDelete = await showDialog<bool>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text("提示"),
+                                    content: Text("选中定时任务中包含未删除的任务行动，确定要删除?"),
+                                    actions: <Widget>[
+                                      FlatButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(false),
+                                          child: Text("取消")),
+                                      FlatButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(true),
+                                          child: Text("确认")),
+                                    ],
+                                  );
+                                });
+                          }
+
                           if (confirmDelete) {
                             for (String intervalId in _selectedToDelete) {
+                              intervalList
+                                  .firstWhere((interval) =>
+                                      interval['id'] == intervalId)['actions']
+                                  .forEach((a) async {
+                                await MyHttp.delete(
+                                        ":48085/api/v1/intervalaction/${a['id']}")
+                                    .catchError((error) {
+                                  print(error);
+                                  print(error.response);
+                                  showDialog<bool>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text("错误提示"),
+                                        content:
+                                            Text(error.response.toString()),
+                                        actions: [
+                                          FlatButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context)
+                                                      .pop(true),
+                                              child: Text("确认")),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                });
+                              });
+                              //刚删除完需要等后端生效
+                              await Future.delayed(Duration(milliseconds: 500));
                               await MyHttp.delete(
                                       ':48085/api/v1/interval/${intervalId}')
                                   .catchError((error) {
