@@ -47,3 +47,10 @@ flutter run
 
 例如http://106.14.157.113:9922/core-metadata/api/v1/deviceservice
 
+
+根目录下包含docker-compose yml 文件，用来本地启动后端服务.
+
+```
+Docker-compose up
+```
+
